@@ -1,0 +1,10 @@
+{
+  "schemaName": "Task",
+  "collectionName": "Tasks",
+  "schemaType": 1,
+  "fields": [
+    { "name": "name", "type": "String", "isArray": false, "isRequired": true, "maxLength": 200 },
+    { "name": "list", "type": "String", "isArray": false, "isRequired": true },
+    { "name": "done", "type": "Boolean", "isArray": false, "isRequired": true }
+  ]
+}

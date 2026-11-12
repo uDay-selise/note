@@ -1,8 +1,8 @@
 {
   "project": {
     "tenantId": "Sff984c736d3b493889810efd873f3f85",
-    "apiUrl": "https://dev-api.blocksdevelopers.com",
-    "appDomain": ""
+    "apiUrl": "https://blocksapi.dev.slsblx.com",
+    "appDomain": "https://Sff984c736d3b493889810efd873f3f85-3b0164d5-ddf3-45c9-ab6f-09a01d0fee0a.slsblx.com"
   },
   "data": {
     "schemas": "blocks/data/schemas",

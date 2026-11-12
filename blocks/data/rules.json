@@ -1,3 +1,254 @@
 {
-  "policies": []
+  "security": [
+    {
+      "schemaName": "List",
+      "operation": 0,
+      "policyType": 0,
+      "accessLevel": 3,
+      "fieldNames": []
+    },
+    {
+      "schemaName": "List",
+      "operation": 1,
+      "policyType": 0,
+      "accessLevel": 3,
+      "fieldNames": []
+    },
+    {
+      "schemaName": "List",
+      "operation": 2,
+      "policyType": 0,
+      "accessLevel": 3,
+      "fieldNames": []
+    },
+    {
+      "schemaName": "List",
+      "operation": 3,
+      "policyType": 0,
+      "accessLevel": 3,
+      "fieldNames": []
+    },
+    {
+      "schemaName": "Task",
+      "operation": 0,
+      "policyType": 0,
+      "accessLevel": 3,
+      "fieldNames": []
+    },
+    {
+      "schemaName": "Task",
+      "operation": 1,
+      "policyType": 0,
+      "accessLevel": 3,
+      "fieldNames": []
+    },
+    {
+      "schemaName": "Task",
+      "operation": 2,
+      "policyType": 0,
+      "accessLevel": 3,
+      "fieldNames": []
+    },
+    {
+      "schemaName": "Task",
+      "operation": 3,
+      "policyType": 0,
+      "accessLevel": 3,
+      "fieldNames": []
+    }
+  ],
+  "policies": [
+    {
+      "policyName": "List owner 0",
+      "schemaName": "List",
+      "operation": 0,
+      "policyType": 0,
+      "entityName": "",
+      "fieldNames": [],
+      "ruleGroup": {
+        "logicalOperator": 0,
+        "rules": [
+          {
+            "leftSource": 0,
+            "leftOperand": "UserId",
+            "operator": 0,
+            "rightSource": 1,
+            "rightOperand": "CreatedBy",
+            "staticValue": ""
+          }
+        ],
+        "nestedGroups": []
+      },
+      "priority": 0,
+      "isAllowPolicy": true
+    },
+    {
+      "policyName": "List owner 1",
+      "schemaName": "List",
+      "operation": 1,
+      "policyType": 0,
+      "entityName": "",
+      "fieldNames": [],
+      "ruleGroup": {
+        "logicalOperator": 0,
+        "rules": [
+          {
+            "leftSource": 0,
+            "leftOperand": "UserId",
+            "operator": 0,
+            "rightSource": 1,
+            "rightOperand": "CreatedBy",
+            "staticValue": ""
+          }
+        ],
+        "nestedGroups": []
+      },
+      "priority": 0,
+      "isAllowPolicy": true
+    },
+    {
+      "policyName": "List owner 2",
+      "schemaName": "List",
+      "operation": 2,
+      "policyType": 0,
+      "entityName": "",
+      "fieldNames": [],
+      "ruleGroup": {
+        "logicalOperator": 0,
+        "rules": [
+          {
+            "leftSource": 0,
+            "leftOperand": "UserId",
+            "operator": 0,
+            "rightSource": 1,
+            "rightOperand": "CreatedBy",
+            "staticValue": ""
+          }
+        ],
+        "nestedGroups": []
+      },
+      "priority": 0,
+      "isAllowPolicy": true
+    },
+    {
+      "policyName": "List owner 3",
+      "schemaName": "List",
+      "operation": 3,
+      "policyType": 0,
+      "entityName": "",
+      "fieldNames": [],
+      "ruleGroup": {
+        "logicalOperator": 0,
+        "rules": [
+          {
+            "leftSource": 0,
+            "leftOperand": "UserId",
+            "operator": 0,
+            "rightSource": 1,
+            "rightOperand": "CreatedBy",
+            "staticValue": ""
+          }
+        ],
+        "nestedGroups": []
+      },
+      "priority": 0,
+      "isAllowPolicy": true
+    },
+    {
+      "policyName": "Task owner 0",
+      "schemaName": "Task",
+      "operation": 0,
+      "policyType": 0,
+      "entityName": "",
+      "fieldNames": [],
+      "ruleGroup": {
+        "logicalOperator": 0,
+        "rules": [
+          {
+            "leftSource": 0,
+            "leftOperand": "UserId",
+            "operator": 0,
+            "rightSource": 1,
+            "rightOperand": "CreatedBy",
+            "staticValue": ""
+          }
+        ],
+        "nestedGroups": []
+      },
+      "priority": 0,
+      "isAllowPolicy": true
+    },
+    {
+      "policyName": "Task owner 1",
+      "schemaName": "Task",
+      "operation": 1,
+      "policyType": 0,
+      "entityName": "",
+      "fieldNames": [],
+      "ruleGroup": {
+        "logicalOperator": 0,
+        "rules": [
+          {
+            "leftSource": 0,
+            "leftOperand": "UserId",
+            "operator": 0,
+            "rightSource": 1,
+            "rightOperand": "CreatedBy",
+            "staticValue": ""
+          }
+        ],
+        "nestedGroups": []
+      },
+      "priority": 0,
+      "isAllowPolicy": true
+    },
+    {
+      "policyName": "Task owner 2",
+      "schemaName": "Task",
+      "operation": 2,
+      "policyType": 0,
+      "entityName": "",
+      "fieldNames": [],
+      "ruleGroup": {
+        "logicalOperator": 0,
+        "rules": [
+          {
+            "leftSource": 0,
+            "leftOperand": "UserId",
+            "operator": 0,
+            "rightSource": 1,
+            "rightOperand": "CreatedBy",
+            "staticValue": ""
+          }
+        ],
+        "nestedGroups": []
+      },
+      "priority": 0,
+      "isAllowPolicy": true
+    },
+    {
+      "policyName": "Task owner 3",
+      "schemaName": "Task",
+      "operation": 3,
+      "policyType": 0,
+      "entityName": "",
+      "fieldNames": [],
+      "ruleGroup": {
+        "logicalOperator": 0,
+        "rules": [
+          {
+            "leftSource": 0,
+            "leftOperand": "UserId",
+            "operator": 0,
+            "rightSource": 1,
+            "rightOperand": "CreatedBy",
+            "staticValue": ""
+          }
+        ],
+        "nestedGroups": []
+      },
+      "priority": 0,
+      "isAllowPolicy": true
+    }
+  ]
 }

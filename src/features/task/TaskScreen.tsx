@@ -18,7 +18,7 @@ export function TaskScreen({ situation = "normal", onNavigate }: { situation?: T
   return (
     <div className="studio-screen-task" style={{ display: "contents" }}>
       <main data-screen="task">
-        <HeaderPart onNavigate={onNavigate} />
+        <HeaderPart onNavigate={onNavigate} person={{ name: "", initials: "" }} onSignOut={() => undefined} />
         {situation === "not-allowed" ? (
           <section data-state="not-allowed">
             <div className="ds-page tk-wrap">
@@ -56,7 +56,7 @@ export function TaskScreen({ situation = "normal", onNavigate }: { situation?: T
               <div className="ds-page-head tk-head">
                 <div>
                   <span className="ds-eyebrow">Task</span>
-                  <h1 className="ds-h1" data-sample="Task#1.title">Buy milk and oat coffee creamer for Friday</h1>
+                  <h1 className="ds-h1" data-drawn="Task#1.title">Buy milk and oat coffee creamer for Friday</h1>
                   <div className="tk-head-meta">
                     <span>In</span>
                     {" "}
@@ -91,7 +91,7 @@ export function TaskScreen({ situation = "normal", onNavigate }: { situation?: T
                         <div className="ds-field">
                           <label className="ds-label" htmlFor="task-name-done">Task name</label>
                           {" "}
-                          <input className="ds-input" id="task-name-done" type="text" defaultValue="Buy milk and oat coffee creamer for Friday" data-sample="Task#1.title" />
+                          <input className="ds-input" id="task-name-done" type="text" defaultValue="Buy milk and oat coffee creamer for Friday" data-drawn="Task#1.title" />
                         </div>
                         <div className="ds-field">
                           <label className="ds-label" htmlFor="task-list-done">List</label>
@@ -127,7 +127,7 @@ export function TaskScreen({ situation = "normal", onNavigate }: { situation?: T
                       </div>
                       <div>
                         <dt>Added</dt>
-                        <dd data-sample="">Thu 12 Nov 2026</dd>
+                        <dd data-drawn="">Thu 12 Nov 2026</dd>
                       </div>
                     </dl>
                   </div>
@@ -156,7 +156,7 @@ export function TaskScreen({ situation = "normal", onNavigate }: { situation?: T
               <div className="ds-page-head tk-head">
                 <div>
                   <span className="ds-eyebrow">Task</span>
-                  <h1 className="ds-h1" data-sample="Task#1.title">Buy milk and oat coffee creamer for Friday</h1>
+                  <h1 className="ds-h1" data-drawn="Task#1.title">Buy milk and oat coffee creamer for Friday</h1>
                   <div className="tk-head-meta">
                     <span>In</span>
                     {" "}
@@ -191,7 +191,7 @@ export function TaskScreen({ situation = "normal", onNavigate }: { situation?: T
                         <div className="ds-field">
                           <label className="ds-label" htmlFor="task-name">Task name</label>
                           {" "}
-                          <input className="ds-input" id="task-name" type="text" defaultValue="Buy milk and oat coffee creamer for Friday" data-sample="Task#1.title" />
+                          <input className="ds-input" id="task-name" type="text" defaultValue="Buy milk and oat coffee creamer for Friday" data-drawn="Task#1.title" />
                           {" "}
                           <span className="ds-hint">Up to 200 characters.</span>
                         </div>
@@ -229,7 +229,7 @@ export function TaskScreen({ situation = "normal", onNavigate }: { situation?: T
                       </div>
                       <div>
                         <dt>Added</dt>
-                        <dd data-sample="">Thu 12 Nov 2026</dd>
+                        <dd data-drawn="">Thu 12 Nov 2026</dd>
                       </div>
                     </dl>
                   </div>

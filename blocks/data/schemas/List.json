@@ -1,0 +1,8 @@
+{
+  "schemaName": "List",
+  "collectionName": "Lists",
+  "schemaType": 1,
+  "fields": [
+    { "name": "name", "type": "String", "isArray": false, "isRequired": true, "maxLength": 60 }
+  ]
+}

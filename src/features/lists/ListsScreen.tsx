@@ -2,14 +2,57 @@
 // Its markup, classes and CSS are the design's: wire real data, translation keys, routes and SDK
 // actions into it and change nothing visual. Studio writes it again only when the design is redrawn;
 // then `git diff` shows what to carry over.
-import type { MouseEvent } from "react";
+import type { ChangeEvent, FormEvent, MouseEvent, ReactNode } from "react";
 import { HeaderPart } from "../../app/layout/HeaderPart";
+import type { HeaderPerson } from "../../app/layout/HeaderPart";
+import { useT } from "../../lib/i18n/LocalizationProvider";
+import type { ListRecord, TaskRecord } from "./listsApi";
 import "./ListsScreen.css";
 
 /** The situations the design shows: the screen as it usually is, then each one drawn. Show the one the real data or request is in. */
+function madeDate(value?: string): string {
+  if (!value) return "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function countKey(count: number): "lists.taskCount.one" | "lists.taskCount.many" {
+  return count === 1 ? "lists.taskCount.one" : "lists.taskCount.many";
+}
+
+function ListMenuIcon(): ReactNode {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+      <circle cx="5" cy="12" r="1.5" />
+      <circle cx="12" cy="12" r="1.5" />
+      <circle cx="19" cy="12" r="1.5" />
+    </svg>
+  );
+}
+
 export type ListsScreenSituation = "normal" | "empty" | "error" | "loading" | "no-lists";
 
-export function ListsScreen({ situation = "normal", onNavigate }: { situation?: ListsScreenSituation; onNavigate?: (path: string) => void }) {
+export type ListsScreenData = {
+  firstName: string;
+  person: HeaderPerson;
+  onSignOut: () => void;
+  formOpen: boolean;
+  lists: ListRecord[];
+  tasks: TaskRecord[];
+  name: string;
+  onNameChange: (value: string) => void;
+  onSubmit: (event: FormEvent) => void;
+  onMakeList: () => void;
+  onCancel: () => void;
+  onRetry: () => void;
+  saving: boolean;
+  message?: string;
+  errorMessage?: string;
+  onOpenTask: (id: string) => void;
+};
+
+export function ListsScreen({ situation = "normal", data, onNavigate }: { situation?: ListsScreenSituation; data: ListsScreenData; onNavigate?: (path: string) => void }) {
+  const { t } = useT();
   const goTo = (path: string) => (event: MouseEvent) => {
     if (!onNavigate) return;
     event.preventDefault();
@@ -20,15 +63,15 @@ export function ListsScreen({ situation = "normal", onNavigate }: { situation?: 
       <main data-screen="lists" className="lists-root">
         <div className="ds-deco lists-deco-a" />
         <div className="ds-deco lists-deco-b" />
-        <HeaderPart onNavigate={onNavigate} />
+        <HeaderPart onNavigate={onNavigate} person={data.person} onSignOut={data.onSignOut} />
         {situation === "empty" ? (
           <section data-state="empty">
             <div className="ds-page lists-head">
               <div className="ds-page-head">
                 <div>
-                  <span className="ds-eyebrow" data-sample="me.name">Priya's lists</span>
-                  <h1 className="ds-h1 lists-title">My lists</h1>
-                  <p className="ds-muted lists-sub">Your own little corners for tasks. Add one, tick it off, done.</p>
+                  <span className="ds-eyebrow" data-sample="me.name">{t("lists.eyebrow", { name: data.firstName !== t("app.name") ? data.firstName : "you" })}</span>
+                  <h1 className="ds-h1 lists-title">{t("lists.title")}</h1>
+                  <p className="ds-muted lists-sub">{t("lists.sub")}</p>
                 </div>
                 <div className="ds-actions">
                   <button className="ds-btn" type="button"> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> Make a list </button>
@@ -47,11 +90,11 @@ export function ListsScreen({ situation = "normal", onNavigate }: { situation?: 
                     {" "}
                   </span>
                   {" "}
-                  <b style={{ color: "hsl(var(--foreground))", fontSize: "18px" }}>No lists yet. Make your first list.</b>
+                  <b style={{ color: "hsl(var(--foreground))", fontSize: "18px" }}>{t("lists.empty.title")}</b>
                   {" "}
-                  <span>Give it a name and start adding tasks to it.</span>
+                  <span>{t("lists.empty.detail")}</span>
                   {" "}
-                  <button className="ds-btn" type="button" style={{ marginTop: "calc(8px * var(--space-scale, 1))" }}> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> Make a list </button>
+                  <button className="ds-btn" type="button" style={{ marginTop: "calc(8px * var(--space-scale, 1))" }} onClick={data.onMakeList}> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> {t("lists.makeList")} </button>
                 </div>
               </div>
             </div>
@@ -62,9 +105,9 @@ export function ListsScreen({ situation = "normal", onNavigate }: { situation?: 
             <div className="ds-page lists-head">
               <div className="ds-page-head">
                 <div>
-                  <span className="ds-eyebrow" data-sample="me.name">Priya's lists</span>
-                  <h1 className="ds-h1 lists-title">My lists</h1>
-                  <p className="ds-muted lists-sub">Your own little corners for tasks. Add one, tick it off, done.</p>
+                  <span className="ds-eyebrow" data-sample="me.name">{t("lists.eyebrow", { name: data.firstName !== t("app.name") ? data.firstName : "you" })}</span>
+                  <h1 className="ds-h1 lists-title">{t("lists.title")}</h1>
+                  <p className="ds-muted lists-sub">{t("lists.sub")}</p>
                 </div>
               </div>
             </div>
@@ -81,11 +124,11 @@ export function ListsScreen({ situation = "normal", onNavigate }: { situation?: 
                     {" "}
                   </span>
                   {" "}
-                  <b style={{ color: "hsl(var(--foreground))", fontSize: "18px" }}>Your lists didn't load</b>
+                  <b style={{ color: "hsl(var(--foreground))", fontSize: "18px" }}>{t("lists.error.title")}</b>
                   {" "}
-                  <span>Something went wrong on the way. Try again in a moment.</span>
+                  <span>{t("lists.error.detail")}</span>
                   {" "}
-                  <button className="ds-btn ds-btn-secondary" type="button" style={{ marginTop: "calc(8px * var(--space-scale, 1))" }}> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6" /><path d="M20 4v5h-5" /></svg> Try again </button>
+                  <button className="ds-btn ds-btn-secondary" type="button" style={{ marginTop: "calc(8px * var(--space-scale, 1))" }} onClick={data.onRetry}> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6" /><path d="M20 4v5h-5" /></svg> {t("lists.error.retry")} </button>
                 </div>
               </div>
             </div>
@@ -96,9 +139,9 @@ export function ListsScreen({ situation = "normal", onNavigate }: { situation?: 
             <div className="ds-page lists-head">
               <div className="ds-page-head">
                 <div>
-                  <span className="ds-eyebrow" data-sample="me.name">Priya's lists</span>
-                  <h1 className="ds-h1 lists-title">My lists</h1>
-                  <p className="ds-muted lists-sub">Your own little corners for tasks. Add one, tick it off, done.</p>
+                  <span className="ds-eyebrow" data-sample="me.name">{t("lists.eyebrow", { name: data.firstName !== t("app.name") ? data.firstName : "you" })}</span>
+                  <h1 className="ds-h1 lists-title">{t("lists.title")}</h1>
+                  <p className="ds-muted lists-sub">{t("lists.sub")}</p>
                 </div>
               </div>
             </div>
@@ -131,9 +174,9 @@ export function ListsScreen({ situation = "normal", onNavigate }: { situation?: 
             <div className="ds-page lists-head">
               <div className="ds-page-head">
                 <div>
-                  <span className="ds-eyebrow" data-sample="me.name">Priya's lists</span>
-                  <h1 className="ds-h1 lists-title">My lists</h1>
-                  <p className="ds-muted lists-sub">Your own little corners for tasks. Add one, tick it off, done.</p>
+                  <span className="ds-eyebrow" data-sample="me.name">{t("lists.eyebrow", { name: data.firstName !== t("app.name") ? data.firstName : "you" })}</span>
+                  <h1 className="ds-h1 lists-title">{t("lists.title")}</h1>
+                  <p className="ds-muted lists-sub">{t("lists.sub")}</p>
                 </div>
               </div>
             </div>
@@ -149,11 +192,11 @@ export function ListsScreen({ situation = "normal", onNavigate }: { situation?: 
                     {" "}
                   </span>
                   {" "}
-                  <b style={{ color: "hsl(var(--foreground))", fontSize: "18px" }}>Make a list first, then add tasks to it.</b>
+                  <b style={{ color: "hsl(var(--foreground))", fontSize: "18px" }}>{t("lists.noLists.title")}</b>
                   {" "}
-                  <span>Tasks need a home. A list takes a moment to make.</span>
+                  <span>{t("lists.noLists.detail")}</span>
                   {" "}
-                  <button className="ds-btn" type="button" style={{ marginTop: "calc(8px * var(--space-scale, 1))" }}> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> Make a list </button>
+                  <button className="ds-btn" type="button" style={{ marginTop: "calc(8px * var(--space-scale, 1))" }} onClick={data.onMakeList}> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> {t("lists.makeList")} </button>
                 </div>
               </div>
             </div>
@@ -164,194 +207,92 @@ export function ListsScreen({ situation = "normal", onNavigate }: { situation?: 
             <div className="ds-page lists-head">
               <div className="ds-page-head">
                 <div>
-                  <span className="ds-eyebrow" data-sample="me.name">Priya's lists</span>
-                  <h1 className="ds-h1 lists-title">My lists</h1>
-                  <p className="ds-muted lists-sub">Your own little corners for tasks. Add one, tick it off, done.</p>
+                  <span className="ds-eyebrow" data-sample="me.name">{t("lists.eyebrow", { name: data.firstName !== t("app.name") ? data.firstName : "you" })}</span>
+                  <h1 className="ds-h1 lists-title">{t("lists.title")}</h1>
+                  <p className="ds-muted lists-sub">{t("lists.sub")}</p>
                 </div>
                 <div className="ds-actions">
-                  <button className="ds-btn" type="button"> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> Make a list </button>
+                  <button className="ds-btn" type="button" onClick={data.onMakeList}> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> {t("lists.makeList")} </button>
                 </div>
               </div>
             </div>
             <div className="ds-page lists-body">
-              <section className="ds-card ds-panel new-list" id="make-list" aria-label="Make a list">
+              <section className="ds-card ds-panel new-list" id="make-list" aria-label={t("lists.form.title")} style={data.formOpen ? undefined : { display: "none" }}>
                 <div className="new-list-inner">
-                  <h2 className="ds-h2" style={{ fontSize: "20px", margin: "0 0 calc(4px * var(--space-scale, 1))" }}>Make a list</h2>
-                  <p className="ds-muted" style={{ margin: "0 0 calc(16px * var(--space-scale, 1))", fontSize: "14px" }}>Give it a name you'll spot quickly.</p>
-                  <form className="ds-form">
+                  <h2 className="ds-h2" style={{ fontSize: "20px", margin: "0 0 calc(4px * var(--space-scale, 1))" }}>{t("lists.form.title")}</h2>
+                  <p className="ds-muted" style={{ margin: "0 0 calc(16px * var(--space-scale, 1))", fontSize: "14px" }}>{t("lists.form.detail")}</p>
+                  <form className="ds-form" onSubmit={data.onSubmit}>
                     <div className="ds-field">
-                      <label className="ds-label" htmlFor="list-name">List name</label>
+                      <label className="ds-label" htmlFor="list-name">{t("lists.form.label")}</label>
                       {" "}
-                      <input className="ds-input" id="list-name" type="text" maxLength={60} placeholder="Work, Home, Weekend jobs" data-sample="List#new.name" />
+                      <input className="ds-input" id="list-name" type="text" maxLength={60} value={data.name} onChange={(event: ChangeEvent<HTMLInputElement>) => data.onNameChange(event.target.value)} placeholder={t("lists.form.samples")} data-sample="List#new.name" />
                       {" "}
-                      <span className="ds-hint">Up to 60 characters.</span>
+                      <span className="ds-hint">{t("lists.form.hint")}</span>
+                      {data.errorMessage ? <span className="ds-hint" role="alert">{data.errorMessage}</span> : null}
                     </div>
                     <div className="ds-form-actions">
-                      <a className="ds-btn ds-btn-secondary" href="#">Cancel</a>
+                      <a className="ds-btn ds-btn-secondary" href="#" onClick={(event) => { event.preventDefault(); data.onCancel(); }}>{t("lists.form.cancel")}</a>
                       {" "}
-                      <button className="ds-btn" type="submit">Make list</button>
+                      <button className="ds-btn" type="submit" disabled={data.saving}>{t("lists.form.submit")}</button>
                     </div>
                   </form>
                 </div>
               </section>
               <div className="list-grid lift">
-                <article className="ds-card list-card" data-sample="List#1.name">
-                  <div className="list-card-top">
-                    <div className="list-titles">
-                      <h2 className="list-name">Work</h2>
-                      <p className="ds-muted list-meta">Made 9 November 2026</p>
+                {data.lists.length === 0 ? (
+                  <div className="lists-empty">
+                    <div className="ds-empty" style={{ padding: "0" }}>
+                      <b style={{ color: "hsl(var(--foreground))", fontSize: "18px" }}>{t("lists.empty.title")}</b>
+                      <button className="ds-btn" type="button" style={{ marginTop: "calc(8px * var(--space-scale, 1))" }} onClick={data.onMakeList}> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> {t("lists.makeList")} </button>
                     </div>
-                    <details className="ds-menu">
-                      <summary className="ds-btn ds-btn-ghost ds-btn-icon" aria-label="Actions for Work">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-                          <circle cx="5" cy="12" r="1.5" />
-                          <circle cx="12" cy="12" r="1.5" />
-                          <circle cx="19" cy="12" r="1.5" />
-                        </svg>
-                      </summary>
-                      <div className="ds-menu-list">
-                        <a href="/tasks/:id" data-goto="task" onClick={goTo("/tasks/:id")}>Rename list</a>
-                        {" "}
-                        <a href="#">Remove list</a>
+                  </div>
+                ) : null}
+                {data.lists.map((list) => {
+                  const listTasks = data.tasks
+                    .filter((task) => task.list === list.itemId)
+                    .sort((a, b) => Number(a.done) - Number(b.done));
+                  return (
+                    <article className="ds-card list-card" data-sample="List#1.name" key={list.itemId}>
+                      <div className="list-card-top">
+                        <div className="list-titles">
+                          <h2 className="list-name">{list.name}</h2>
+                          <p className="ds-muted list-meta">{t("lists.madeOn", { date: madeDate(list.CreatedDate) })}</p>
+                        </div>
+                        <details className="ds-menu">
+                          <summary className="ds-btn ds-btn-ghost ds-btn-icon" aria-label={t("lists.actionsFor", { name: list.name })}>
+                            <ListMenuIcon />
+                          </summary>
+                          <div className="ds-menu-list">
+                            <a href="/tasks/:id" data-goto="task" onClick={goTo("/tasks/:id")}>{t("lists.renameList")}</a>
+                            {" "}
+                            <a href="#">{t("lists.removeList")}</a>
+                          </div>
+                        </details>
                       </div>
-                    </details>
-                  </div>
-                  <div className="ds-divider" />
-                  <div className="task-rows">
-                    <div className="task">
-                      <input type="checkbox" className="ds-check" aria-label="Mark Send the handover notes done" />
-                      {" "}
-                      <a href="/tasks/:id" className="task-name" data-goto="task" data-sample="Task#1.title" onClick={goTo("/tasks/:id")}>Send the handover notes</a>
-                    </div>
-                    <div className="task">
-                      <input type="checkbox" className="ds-check" aria-label="Mark Book the room for Thursday's review done" />
-                      {" "}
-                      <a href="/tasks/:id" className="task-name" data-goto="task" data-sample="Task#2.title" onClick={goTo("/tasks/:id")}>Book the room for Thursday's review, the big one with the screen</a>
-                    </div>
-                    <div className="task task-done">
-                      <input type="checkbox" className="ds-check" defaultChecked aria-label="Mark Reply to Dana about the invoice done" />
-                      {" "}
-                      <a href="/tasks/:id" className="task-name" data-goto="task" data-sample="Task#3.title" onClick={goTo("/tasks/:id")}>Reply to Dana about the invoice</a>
-                    </div>
-                  </div>
-                  <div className="list-foot">
-                    <button className="ds-btn ds-btn-ghost ds-btn-sm" type="button"> <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> Add a task </button>
-                    {" "}
-                    <span className="ds-spacer" />
-                    {" "}
-                    <span className="ds-muted" style={{ fontSize: "13px" }} data-sample="">3 tasks</span>
-                  </div>
-                </article>
-                <article className="ds-card list-card" data-sample="List#2.name">
-                  <div className="list-card-top">
-                    <div className="list-titles">
-                      <h2 className="list-name">Home</h2>
-                      <p className="ds-muted list-meta">Made 7 November 2026</p>
-                    </div>
-                    <details className="ds-menu">
-                      <summary className="ds-btn ds-btn-ghost ds-btn-icon" aria-label="Actions for Home">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-                          <circle cx="5" cy="12" r="1.5" />
-                          <circle cx="12" cy="12" r="1.5" />
-                          <circle cx="19" cy="12" r="1.5" />
-                        </svg>
-                      </summary>
-                      <div className="ds-menu-list">
-                        <a href="/tasks/:id" data-goto="task" onClick={goTo("/tasks/:id")}>Rename list</a>
+                      <div className="ds-divider" />
+                      {listTasks.length === 0 ? (
+                        <div className="task-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M9 11l3 3 8-8" /><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9" /></svg> {t("lists.noTasks")}</div>
+                      ) : (
+                        <div className="task-rows">
+                          {listTasks.map((task) => (
+                            <div className={task.done ? "task task-done" : "task"} key={task.itemId}>
+                              <input type="checkbox" className="ds-check" checked={Boolean(task.done)} readOnly aria-label={t("lists.taskDone", { name: task.name })} />
+                              {" "}
+                              <a href={`/tasks/${task.itemId}`} className="task-name" data-goto="task" data-sample="Task#1.title" onClick={goTo(`/tasks/${task.itemId}`)}>{task.name}</a>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div className="list-foot">
+                        <button className="ds-btn ds-btn-ghost ds-btn-sm" type="button"> <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> {t("lists.addTask")} </button>
                         {" "}
-                        <a href="#">Remove list</a>
-                      </div>
-                    </details>
-                  </div>
-                  <div className="ds-divider" />
-                  <div className="task-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M9 11l3 3 8-8" /><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9" /></svg> No tasks in this list yet. Add the first one.</div>
-                  <div className="list-foot">
-                    <button className="ds-btn ds-btn-ghost ds-btn-sm" type="button"> <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> Add a task </button>
-                    {" "}
-                    <span className="ds-spacer" />
-                    {" "}
-                    <span className="ds-muted" style={{ fontSize: "13px" }} data-sample="">0 tasks</span>
-                  </div>
-                </article>
-                <article className="ds-card list-card" data-sample="List#3.name">
-                  <div className="list-card-top">
-                    <div className="list-titles">
-                      <h2 className="list-name">Weekend jobs</h2>
-                      <p className="ds-muted list-meta">Made 2 November 2026</p>
-                    </div>
-                    <details className="ds-menu">
-                      <summary className="ds-btn ds-btn-ghost ds-btn-icon" aria-label="Actions for Weekend jobs">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-                          <circle cx="5" cy="12" r="1.5" />
-                          <circle cx="12" cy="12" r="1.5" />
-                          <circle cx="19" cy="12" r="1.5" />
-                        </svg>
-                      </summary>
-                      <div className="ds-menu-list">
-                        <a href="/tasks/:id" data-goto="task" onClick={goTo("/tasks/:id")}>Rename list</a>
+                        <span className="ds-spacer" />
                         {" "}
-                        <a href="#">Remove list</a>
+                        <span className="ds-muted" style={{ fontSize: "13px" }} data-sample="">{t(countKey(listTasks.length), { count: String(listTasks.length) })}</span>
                       </div>
-                    </details>
-                  </div>
-                  <div className="ds-divider" />
-                  <div className="task-rows">
-                    <div className="task task-done">
-                      <input type="checkbox" className="ds-check" defaultChecked aria-label="Mark Clear the shed done" />
-                      {" "}
-                      <a href="/tasks/:id" className="task-name" data-goto="task" data-sample="Task#4.title" onClick={goTo("/tasks/:id")}>Clear the shed</a>
-                    </div>
-                  </div>
-                  <div className="list-foot">
-                    <button className="ds-btn ds-btn-ghost ds-btn-sm" type="button"> <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> Add a task </button>
-                    {" "}
-                    <span className="ds-spacer" />
-                    {" "}
-                    <span className="ds-muted" style={{ fontSize: "13px" }} data-sample="">1 task</span>
-                  </div>
-                </article>
-                <article className="ds-card list-card" data-sample="List#4.name">
-                  <div className="list-card-top">
-                    <div className="list-titles">
-                      <h2 className="list-name">Books to read</h2>
-                      <p className="ds-muted list-meta">Made 28 October 2026</p>
-                    </div>
-                    <details className="ds-menu">
-                      <summary className="ds-btn ds-btn-ghost ds-btn-icon" aria-label="Actions for Books to read">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
-                          <circle cx="5" cy="12" r="1.5" />
-                          <circle cx="12" cy="12" r="1.5" />
-                          <circle cx="19" cy="12" r="1.5" />
-                        </svg>
-                      </summary>
-                      <div className="ds-menu-list">
-                        <a href="/tasks/:id" data-goto="task" onClick={goTo("/tasks/:id")}>Rename list</a>
-                        {" "}
-                        <a href="#">Remove list</a>
-                      </div>
-                    </details>
-                  </div>
-                  <div className="ds-divider" />
-                  <div className="task-rows">
-                    <div className="task">
-                      <input type="checkbox" className="ds-check" aria-label="Mark Finish The Long Way to a Small Angry Planet done" />
-                      {" "}
-                      <a href="/tasks/:id" className="task-name" data-goto="task" data-sample="Task#5.title" onClick={goTo("/tasks/:id")}>Finish The Long Way to a Small Angry Planet</a>
-                    </div>
-                    <div className="task task-done">
-                      <input type="checkbox" className="ds-check" defaultChecked aria-label="Mark Borrow Piranesi from the library done" />
-                      {" "}
-                      <a href="/tasks/:id" className="task-name" data-goto="task" data-sample="Task#6.title" onClick={goTo("/tasks/:id")}>Borrow Piranesi from the library</a>
-                    </div>
-                  </div>
-                  <div className="list-foot">
-                    <button className="ds-btn ds-btn-ghost ds-btn-sm" type="button"> <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> Add a task </button>
-                    {" "}
-                    <span className="ds-spacer" />
-                    {" "}
-                    <span className="ds-muted" style={{ fontSize: "13px" }} data-sample="">2 tasks</span>
-                  </div>
-                </article>
+                    </article>
+                  );
+                })}
               </div>
             </div>
           </div>

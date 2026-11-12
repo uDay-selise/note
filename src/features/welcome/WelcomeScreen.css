@@ -251,3 +251,9 @@
     .wc-deco-ring { width: 150px; height: 150px; top: -30px; right: 0; }
   }
 }
+:where(.studio-screen-welcome) .wc-signin-error {
+  color: hsl(var(--danger-soft-foreground));
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 42ch;
+}
