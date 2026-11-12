@@ -64,6 +64,7 @@ export const defaultDictionary = {
   "lists.taskForm.title": "Add a task",
   "lists.taskForm.detail": "Give it a short name you'll know at a glance.",
   "lists.taskForm.label": "Task name",
+  "lists.taskForm.listLabel": "List",
   "lists.taskForm.nameHint": "Up to 200 characters.",
   "lists.taskForm.saved": "Task added to {list}.",
   "lists.taskForm.cancel": "Cancel",

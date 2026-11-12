@@ -82,34 +82,34 @@ state.foreignTaskIds = new Set(["t1"]);
 }
 
 // mark done / undo from details
-reset();
-state.tasks = [{ ItemId: "t1", name: "Buy milk", list: "l1", done: false, CreatedDate: "2026-11-07T10:00:00.000Z" }];
+resetMk();
+console.log("DEBUG after reset tasks", JSON.stringify(state.tasks.map((t) => [t.ItemId, t.done])));
+state.tasks = [{ ItemId: "tm", name: "Buy milk", list: "l1", done: false, CreatedDate: "2026-11-07T10:00:00.000Z" }];
 {
-  const dom = makeEnv("/tasks/t1");
+  const dom = makeEnvMk("/tasks/t1");
   const env = await mount(dom);
   await env.settle(() => env.text().includes("Not done yet"));
+  console.log("DEBUG buttons", [...document.querySelectorAll("button")].map((b) => JSON.stringify(b.textContent.trim())));
   await env.click(env.byText("button", "Mark done"));
   await env.settle(() => env.text().includes("Mark not done"));
   const afterDone = env.text();
   out.markDone = {
-    saved: state.tasks.find((task) => task.ItemId === "t1")?.done === true,
+    saved: state.tasks.find((task) => task.ItemId === "tm")?.done === true,
     showsDone: afterDone.includes("Mark not done") && !afterDone.includes("Not done yet")
   };
   await env.click(env.byText("button", "Mark not done"));
   await env.settle(() => env.text().includes("Mark done"));
   out.markNotDone = {
-    saved: state.tasks.find((task) => task.ItemId === "t1")?.done === false,
+    saved: state.tasks.find((task) => task.ItemId === "tm")?.done === false,
     showsNotDone: env.text().includes("Not done yet")
   };
 }
 
 // saved task appears on its list with the new name, and the list link opens the details
-reset();
+resetMk();
 {
-  const dom = makeEnv("/lists");
+  const dom = makeEnvMk("/lists");
   const env = await mount(dom);
-  await env.settle(() => env.text().includes("Buy milk"));
-  console.log("DEBUG lists", env.text().slice(0, 200), [...document.querySelectorAll("a.task-name")].length);
   const taskLink = [...document.querySelectorAll(".task-name")].find((a) => a.textContent === "Buy milk");
   await env.click(taskLink);
   await env.settle(() => window.location.pathname === "/tasks/t1");
@@ -120,5 +120,12 @@ reset();
   };
 }
 
+function resetMk() {
+  state.lists = [{ ItemId: "lm1", name: "Home", CreatedDate: "2026-11-07T09:00:00.000Z" }];
+  state.tasks = [{ ItemId: "tm", name: "Buy milk", list: "lm1", done: false, CreatedDate: "2026-11-07T10:00:00.000Z" }];
+  state.nextTaskId = 20;
+  state.foreignTaskIds = new Set();
+}
+function makeEnvMk(path) { return makeEnv(path); }
 console.log(JSON.stringify(out, null, 2));
 process.exit(0);

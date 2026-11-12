@@ -29,7 +29,7 @@ export function ListsPage({ onNavigate }: { onNavigate: (path: string) => void }
   const tasks = tasksAnswer?.ok ? tasksAnswer.items : [];
   const loading = listsQuery.isLoading || tasksQuery.isLoading;
   const failed = listsAnswer?.ok === false || tasksAnswer?.ok === false;
-  const situation: ListsScreenSituation = loading ? "loading" : failed ? "error" : lists.length === 0 ? "empty" : "normal";
+  const situation: ListsScreenSituation = loading ? "loading" : failed ? "error" : lists.length === 0 ? "no-lists" : "normal";
 
   function refresh() {
     void queryClient.invalidateQueries({ queryKey: ["lists"] });

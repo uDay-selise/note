@@ -37,6 +37,7 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | undefined>();
   const [taskFormIn, setTaskFormIn] = useState<string | undefined>();
+  const [taskFormList, setTaskFormList] = useState("");
   const [taskName, setTaskName] = useState("");
   const [savingTask, setSavingTask] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | undefined>();
@@ -106,12 +107,14 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
 
   function startTask(listId: string) {
     setTaskFormIn(listId);
+    setTaskFormList(listId);
     setTaskName("");
     setTaskError(undefined);
   }
 
   function cancelTask() {
     setTaskFormIn(undefined);
+    setTaskFormList("");
     setTaskName("");
     setTaskError(undefined);
   }
@@ -130,7 +133,7 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
       return;
     }
     setSavingTask(true);
-    const reason = await onAddTask(taskFormIn, trimmed);
+    const reason = await onAddTask(taskFormList, trimmed);
     setSavingTask(false);
     if (reason) {
       setTaskError(reason);
@@ -348,6 +351,15 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
                   <input className="ds-input" id="task-name" ref={taskRef} type="text" maxLength={200} value={taskName} onChange={(event) => { setTaskName(event.target.value); setTaskError(undefined); }} aria-invalid={taskError ? true : undefined} />
                   {" "}
                   {taskError ? <span className="ds-error" role="alert">{taskError}</span> : <span className="ds-hint">{t("lists.taskForm.nameHint")}</span>}
+                </div>
+                <div className="ds-field">
+                  <label className="ds-label" htmlFor="task-form-list">{t("lists.taskForm.listLabel")}</label>
+                  {" "}
+                  <select className="ds-select" id="task-form-list" value={taskFormList} onChange={(event) => { setTaskFormList(event.target.value); setTaskError(undefined); }}>
+                    {lists.map((list) => (
+                      <option key={list.itemId} value={list.itemId}>{list.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="ds-form-actions">
                   <button className="ds-btn ds-btn-secondary" type="button" onClick={cancelTask}>{t("lists.taskForm.cancel")}</button>
