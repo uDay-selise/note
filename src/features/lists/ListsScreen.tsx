@@ -37,6 +37,16 @@ export type ListsScreenData = {
   person: HeaderPerson;
   onSignOut: () => void;
   formOpen: boolean;
+  addTaskIn?: string;
+  taskName?: string;
+  onStartTask: (listId: string) => void;
+  onSubmitTask: (event: FormEvent) => void;
+  onCancelTask: () => void;
+  onToggleTask: (task: TaskRecord) => void;
+  taskMessage?: string;
+  toggleError?: string;
+  taskError?: string;
+  savingTask: boolean;
   lists: ListRecord[];
   tasks: TaskRecord[];
   name: string;
@@ -192,9 +202,9 @@ export function ListsScreen({ situation = "normal", data, onNavigate }: { situat
                     {" "}
                   </span>
                   {" "}
-                  <b style={{ color: "hsl(var(--foreground))", fontSize: "18px" }}>{t("lists.noLists.title")}</b>
+                  <b style={{ color: "hsl(var(--foreground))", fontSize: "18px" }}>{t("lists.empty.title")}</b>
                   {" "}
-                  <span>{t("lists.noLists.detail")}</span>
+                  <span>{t("lists.empty.detail")}</span>
                   {" "}
                   <button className="ds-btn" type="button" style={{ marginTop: "calc(8px * var(--space-scale, 1))" }} onClick={data.onMakeList}> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> {t("lists.makeList")} </button>
                 </div>
@@ -238,6 +248,7 @@ export function ListsScreen({ situation = "normal", data, onNavigate }: { situat
                   </form>
                 </div>
               </section>
+              {data.toggleError ? <div className="ds-notice ds-notice-danger" role="alert">{data.toggleError}</div> : null}
               <div className="list-grid lift">
                 {data.lists.length === 0 ? (
                   <div className="lists-empty">
@@ -248,11 +259,12 @@ export function ListsScreen({ situation = "normal", data, onNavigate }: { situat
                   </div>
                 ) : null}
                 {data.lists.map((list) => {
+                  const listKey = String(list.itemId ?? "");
                   const listTasks = data.tasks
-                    .filter((task) => task.list === list.itemId)
+                    .filter((task) => task.list === listKey)
                     .sort((a, b) => Number(a.done) - Number(b.done));
                   return (
-                    <article className="ds-card list-card" data-sample="List#1.name" key={list.itemId}>
+                    <article className="ds-card list-card" data-sample="List#1.name" key={listKey}>
                       <div className="list-card-top">
                         <div className="list-titles">
                           <h2 className="list-name">{list.name}</h2>
@@ -263,7 +275,7 @@ export function ListsScreen({ situation = "normal", data, onNavigate }: { situat
                             <ListMenuIcon />
                           </summary>
                           <div className="ds-menu-list">
-                            <a href="/tasks/:id" data-goto="task" onClick={goTo("/tasks/:id")}>{t("lists.renameList")}</a>
+                            <a href="#" onClick={(event) => event.preventDefault()}>{t("lists.renameList")}</a>
                             {" "}
                             <a href="#">{t("lists.removeList")}</a>
                           </div>
@@ -276,15 +288,33 @@ export function ListsScreen({ situation = "normal", data, onNavigate }: { situat
                         <div className="task-rows">
                           {listTasks.map((task) => (
                             <div className={task.done ? "task task-done" : "task"} key={task.itemId}>
-                              <input type="checkbox" className="ds-check" checked={Boolean(task.done)} readOnly aria-label={t("lists.taskDone", { name: task.name })} />
+                              <input type="checkbox" className="ds-check" checked={Boolean(task.done)} aria-label={t("lists.taskDone", { name: task.name })} onChange={() => data.onToggleTask(task)} />
                               {" "}
-                              <a href={`/tasks/${task.itemId}`} className="task-name" data-goto="task" data-sample="Task#1.title" onClick={goTo(`/tasks/${task.itemId}`)}>{task.name}</a>
+                              <a href={`/tasks/${task.itemId}`} className="task-name" data-goto="task" data-sample="Task#1.title" onClick={task.itemId ? goTo(`/tasks/${task.itemId}`) : (event: MouseEvent) => event.preventDefault()}>{task.name}</a>
                             </div>
                           ))}
                         </div>
                       )}
+                      {data.addTaskIn === listKey ? (
+                        <form className="ds-form add-task" onSubmit={data.onSubmitTask}>
+                          <div className="ds-field">
+                            <label className="ds-label" htmlFor="task-name">{t("lists.taskForm.label")}</label>
+                            {" "}
+                            <input className="ds-input" id="task-name" name="name" type="text" maxLength={200} placeholder={t("lists.taskForm.samples")} />
+                            {data.taskError ? <span className="ds-hint" role="alert">{data.taskError}</span> : null}
+                          </div>
+                          <div className="ds-form-actions">
+                            <button className="ds-btn ds-btn-secondary" type="button" onClick={data.onCancelTask}>{t("lists.taskForm.cancel")}</button>
+                            {" "}
+                            <button className="ds-btn" type="submit" disabled={data.savingTask}>{t("lists.taskForm.submit")}</button>
+                          </div>
+                        </form>
+                      ) : null}
+                      {data.taskMessage && data.addTaskIn === undefined ? (
+                        <div className="ds-notice ds-notice-success" role="status">{data.taskMessage}</div>
+                      ) : null}
                       <div className="list-foot">
-                        <button className="ds-btn ds-btn-ghost ds-btn-sm" type="button"> <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> {t("lists.addTask")} </button>
+                        <button className="ds-btn ds-btn-ghost ds-btn-sm" type="button" onClick={() => data.onStartTask(listKey)}> <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg> {t("lists.addTask")} </button>
                         {" "}
                         <span className="ds-spacer" />
                         {" "}

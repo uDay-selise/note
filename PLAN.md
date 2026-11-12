@@ -9,3 +9,10 @@
 - [x] Empty lists screen: "No lists yet. Make your first list." (no app skill)
 - [x] App words in the project's languages, module `app-3b0164d5` (blocks-localization-configuration)
 - [x] Check and build app
+
+## T02 Add a task to a list and tick it off
+- [x] Add a task from a list, with its name checked (blocks-data-gateway-crud)
+- [x] Add a task from the list with no lists wording (blocks-data-gateway-crud)
+- [x] Tick a task done, struck through below the rest (blocks-data-gateway-crud)
+- [x] Untick a done task so it returns above (blocks-data-gateway-crud)
+- [x] Check and build app
