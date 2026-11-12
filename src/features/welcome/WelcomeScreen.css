@@ -1,0 +1,253 @@
+/* Ported by Studio from the agreed design .studio/designs/screens/welcome.html: its own CSS, as drawn, applied only inside
+   this screen. Change nothing here; the build flattens the wrapper for every browser. */
+:where(.studio-screen-welcome) {
+  main[data-screen="welcome"] {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: clip;
+    background:
+      radial-gradient(120% 90% at 8% 0%, hsl(var(--main-200) / 0.55), transparent 55%),
+      radial-gradient(90% 80% at 100% 12%, hsl(var(--accent-200) / 0.5), transparent 55%),
+      radial-gradient(80% 70% at 50% 110%, hsl(var(--main-100) / 0.6), transparent 60%),
+      hsl(var(--background));
+  }
+  .dark & main[data-screen="welcome"] {
+    background:
+      radial-gradient(120% 90% at 8% 0%, hsl(var(--main-700) / 0.45), transparent 55%),
+      radial-gradient(90% 80% at 100% 12%, hsl(var(--accent-800) / 0.4), transparent 55%),
+      radial-gradient(80% 70% at 50% 110%, hsl(var(--main-900) / 0.6), transparent 60%),
+      hsl(var(--background));
+  }
+
+  .wc-bar {
+    display: flex;
+    align-items: center;
+    gap: calc(16px * var(--space-scale, 1));
+    background: hsl(var(--card) / 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  .wc-bar .ds-bar {
+    display: flex;
+    align-items: center;
+    gap: calc(12px * var(--space-scale, 1));
+    padding-top: calc(12px * var(--space-scale, 1));
+    padding-bottom: calc(12px * var(--space-scale, 1));
+  }
+  .wc-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(10px * var(--space-scale, 1));
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: -0.02em;
+    color: hsl(var(--foreground));
+    text-decoration: none;
+  }
+  .wc-mark {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: calc(var(--radius) * 0.7);
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 2px 10px hsl(var(--primary) / 0.4);
+  }
+  .wc-mark svg { width: 18px; height: 18px; }
+  .wc-bar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: calc(8px * var(--space-scale, 1));
+  }
+
+  .wc-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: calc(48px * var(--space-scale, 1));
+    padding-bottom: calc(48px * var(--space-scale, 1));
+  }
+
+  .wc-hero {
+    position: relative;
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: calc(48px * var(--space-scale, 1));
+    align-items: center;
+  }
+  .wc-copy { position: relative; display: flex; flex-direction: column; gap: calc(24px * var(--space-scale, 1)); }
+  .wc-title {
+    font-family: var(--font-heading);
+    font-size: clamp(38px, 6vw, 62px);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    margin: 0;
+    text-wrap: balance;
+  }
+  .wc-title em {
+    font-style: normal;
+    color: hsl(var(--primary-text));
+  }
+  .wc-lede {
+    font-size: 17px;
+    line-height: 1.55;
+    color: hsl(var(--muted-foreground));
+    margin: 0;
+    max-width: 42ch;
+  }
+  .wc-lede b { color: hsl(var(--foreground)); font-weight: 600; }
+  .wc-cta { display: flex; flex-wrap: wrap; align-items: center; gap: calc(16px * var(--space-scale, 1)); }
+  .wc-cta .ds-btn { min-height: 48px; padding-left: calc(24px * var(--space-scale, 1)); padding-right: calc(24px * var(--space-scale, 1)); font-size: 16px; }
+
+  .wc-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(8px * var(--space-scale, 1)) calc(24px * var(--space-scale, 1));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .wc-steps li {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(8px * var(--space-scale, 1));
+    font-size: 14px;
+    color: hsl(var(--muted-foreground));
+  }
+  .wc-step-dot {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: hsl(var(--primary) / 0.14);
+    color: hsl(var(--primary-text));
+  }
+  .wc-step-dot svg { width: 13px; height: 13px; }
+
+  .wc-art {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: calc(16px * var(--space-scale, 1));
+    padding: calc(24px * var(--space-scale, 1));
+    border-radius: calc(var(--radius) * 1.6);
+    background: hsl(var(--card) / 0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow);
+  }
+  .wc-art-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(12px * var(--space-scale, 1));
+  }
+  .wc-list-title {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(8px * var(--space-scale, 1));
+    font-family: var(--font-heading);
+    font-weight: 650;
+    font-size: 16px;
+    color: hsl(var(--foreground));
+  }
+  .wc-list-title svg { width: 16px; height: 16px; color: hsl(var(--primary-text)); }
+  .wc-tasks { display: flex; flex-direction: column; gap: calc(8px * var(--space-scale, 1)); }
+  .wc-task {
+    display: flex;
+    align-items: center;
+    gap: calc(12px * var(--space-scale, 1));
+    padding: calc(12px * var(--space-scale, 1));
+    border-radius: var(--radius);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    font-size: 15px;
+    color: hsl(var(--foreground));
+  }
+  .wc-box {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: calc(var(--radius) * 0.5);
+    border: 1.75px solid hsl(var(--muted-foreground) / 0.5);
+    color: hsl(var(--primary-foreground));
+  }
+  .wc-box svg { width: 13px; height: 13px; }
+  .wc-task-done .wc-box { background: hsl(var(--primary)); border-color: hsl(var(--primary)); }
+  .wc-task-done .wc-task-name { text-decoration: line-through; color: hsl(var(--muted-foreground)); }
+  .wc-task-name { min-width: 0; }
+  .wc-art-foot {
+    display: flex;
+    align-items: center;
+    gap: calc(8px * var(--space-scale, 1));
+    padding-top: calc(8px * var(--space-scale, 1));
+    font-size: 13px;
+    color: hsl(var(--muted-foreground));
+  }
+  .wc-art-foot .ds-badge { margin-left: auto; }
+
+  .wc-note {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(8px * var(--space-scale, 1));
+    padding: calc(16px * var(--space-scale, 1)) calc(24px * var(--space-scale, 1));
+    border-radius: var(--radius);
+    background: hsl(var(--primary) / 0.08);
+    border: 1px solid hsl(var(--primary) / 0.18);
+    font-size: 14px;
+    color: hsl(var(--foreground));
+  }
+  .wc-note svg { width: 18px; height: 18px; color: hsl(var(--primary-text)); flex: none; }
+  .wc-note span { color: hsl(var(--muted-foreground)); }
+
+  .wc-deco-ring {
+    top: -80px;
+    right: 0;
+    width: 260px;
+    height: 260px;
+    border-radius: 999px;
+    border: 1.5px solid hsl(var(--primary) / 0.18);
+    background: radial-gradient(circle at 30% 30%, hsl(var(--primary) / 0.12), transparent 70%);
+  }
+  .wc-deco-dot {
+    bottom: 10%;
+    left: 0;
+    width: 160px;
+    height: 160px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 50% 50%, hsl(var(--accent) / 0.22), transparent 70%);
+  }
+
+  @media (max-width: 900px) {
+    .wc-hero { grid-template-columns: 1fr; gap: calc(32px * var(--space-scale, 1)); }
+    .wc-art { order: 2; }
+    .wc-deco-ring { top: -40px; right: 0; width: 200px; height: 200px; }
+  }
+  @media (max-width: 560px) {
+    .wc-brand { font-size: 15px; gap: calc(8px * var(--space-scale, 1)); }
+    .wc-bar-actions .ds-btn { min-height: 40px; }
+    .wc-hero { gap: calc(24px * var(--space-scale, 1)); }
+    .wc-cta { align-items: stretch; flex-direction: column; }
+    .wc-cta .ds-btn { width: 100%; justify-content: center; }
+    .wc-note { padding: calc(16px * var(--space-scale, 1)); }
+    .wc-deco-dot { display: none; }
+    .wc-deco-ring { width: 150px; height: 150px; top: -30px; right: 0; }
+  }
+}

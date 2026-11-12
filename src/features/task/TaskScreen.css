@@ -1,0 +1,80 @@
+/* Ported by Studio from the agreed design .studio/designs/screens/task.html: its own CSS, as drawn, applied only inside
+   this screen. Change nothing here; the build flattens the wrapper for every browser. */
+:where(.studio-screen-task) {
+  main[data-screen="task"] {
+    min-height: 100vh;
+    background:
+      radial-gradient(1200px 520px at 8% -10%, hsl(var(--primary) / 0.10), transparent 60%),
+      radial-gradient(900px 480px at 100% 0%, hsl(var(--accent) / 0.12), transparent 55%),
+      hsl(var(--background));
+    overflow-x: hidden;
+  }
+
+  .tk-wrap { padding-top: calc(24px * var(--space-scale, 1)); padding-bottom: calc(64px * var(--space-scale, 1)); }
+
+  .tk-crumb {
+    display: inline-flex; align-items: center; gap: calc(6px * var(--space-scale, 1));
+    font-size: 13px; color: hsl(var(--muted-foreground)); text-decoration: none;
+    min-height: 40px; padding: 0 calc(8px * var(--space-scale, 1)); margin-left: calc(-8px * var(--space-scale, 1));
+    border-radius: var(--radius-button); width: fit-content;
+  }
+  .tk-crumb:hover { color: hsl(var(--primary-text)); background: hsl(var(--primary) / 0.08); }
+  .tk-crumb svg { width: 16px; height: 16px; }
+
+  .tk-head { display: flex; align-items: flex-end; justify-content: space-between; gap: calc(24px * var(--space-scale, 1)); flex-wrap: wrap; margin-top: calc(8px * var(--space-scale, 1)); }
+  .tk-head h1 { margin: calc(8px * var(--space-scale, 1)) 0 0; max-width: 22ch; }
+  .tk-head-meta { display: flex; align-items: center; gap: calc(8px * var(--space-scale, 1)); margin-top: calc(12px * var(--space-scale, 1)); flex-wrap: wrap; color: hsl(var(--muted-foreground)); font-size: 14px; }
+  .tk-head-meta .tk-in-list { display: inline-flex; align-items: center; gap: calc(6px * var(--space-scale, 1)); color: hsl(var(--primary-text)); font-weight: 600; text-decoration: none; min-height: 40px; }
+  .tk-head-meta svg { width: 16px; height: 16px; }
+
+  .tk-body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: calc(24px * var(--space-scale, 1)); margin-top: calc(32px * var(--space-scale, 1)); align-items: start; }
+
+  .tk-main {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--card-radius);
+    padding: calc(24px * var(--space-scale, 1));
+    box-shadow: var(--shadow);
+  }
+
+  .tk-status-band {
+    display: flex; align-items: center; gap: calc(16px * var(--space-scale, 1));
+    padding: calc(16px * var(--space-scale, 1)) calc(20px * var(--space-scale, 1));
+    border-radius: var(--radius);
+    background: hsl(var(--primary) / 0.08);
+    border: 1px solid hsl(var(--primary) / 0.18);
+    flex-wrap: wrap;
+  }
+  .tk-status-band h2 { margin: 0; font-size: 16px; font-weight: 600; }
+  .tk-status-band p { margin: calc(2px * var(--space-scale, 1)) 0 0; font-size: 14px; color: hsl(var(--muted-foreground)); }
+  .tk-status-band .tk-toggle { margin-left: auto; }
+
+  .tk-section { margin-top: calc(32px * var(--space-scale, 1)); }
+  .tk-section:first-of-type { margin-top: calc(24px * var(--space-scale, 1)); }
+
+  .tk-side { position: sticky; top: calc(88px * var(--space-scale, 1)); display: grid; gap: calc(16px * var(--space-scale, 1)); }
+  .tk-side .ds-card { padding: calc(20px * var(--space-scale, 1)); }
+  .tk-side h3 { margin: 0 0 calc(16px * var(--space-scale, 1)); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: hsl(var(--muted-foreground)); font-weight: 600; }
+
+  .tk-facts { margin: 0; display: grid; gap: calc(16px * var(--space-scale, 1)); }
+  .tk-facts dt { font-size: 13px; color: hsl(var(--muted-foreground)); }
+  .tk-facts dd { margin: calc(4px * var(--space-scale, 1)) 0 0; font-size: 15px; font-weight: 500; color: hsl(var(--foreground)); }
+
+  .tk-next { display: flex; gap: calc(12px * var(--space-scale, 1)); align-items: flex-start; font-size: 14px; color: hsl(var(--muted-foreground)); line-height: 1.5; }
+
+  .tk-hint-row { margin-top: calc(16px * var(--space-scale, 1)); font-size: 14px; color: hsl(var(--muted-foreground)); }
+
+  .tk-next-btn { margin-top: calc(16px * var(--space-scale, 1)); display: grid; gap: calc(8px * var(--space-scale, 1)); }
+
+  @media (max-width: 1024px) {
+    .tk-body { grid-template-columns: minmax(0, 1fr); }
+    .tk-side { position: static; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .tk-wrap { padding-left: calc(16px * var(--space-scale, 1)); padding-right: calc(16px * var(--space-scale, 1)); }
+    .tk-head { gap: calc(16px * var(--space-scale, 1)); }
+    .tk-main { padding: calc(16px * var(--space-scale, 1)); }
+    .tk-status-band .tk-toggle { margin-left: 0; width: 100%; }
+    .tk-side { grid-template-columns: minmax(0, 1fr); }
+  }
+}

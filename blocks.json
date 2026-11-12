@@ -1,0 +1,11 @@
+{
+  "project": {
+    "tenantId": "Sff984c736d3b493889810efd873f3f85",
+    "apiUrl": "https://dev-api.blocksdevelopers.com",
+    "appDomain": ""
+  },
+  "data": {
+    "schemas": "blocks/data/schemas",
+    "rules": "blocks/data/rules.json"
+  }
+}
