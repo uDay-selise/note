@@ -238,13 +238,3 @@
 .ds-table-card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: calc(14px * var(--space-scale, 1)) 14px; border-bottom: 1px solid var(--table-line, hsl(var(--border))); }
 .ds-table-card-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 10px 14px; border-top: 1px solid var(--table-line, hsl(var(--border))); font-size: 13px; color: hsl(var(--muted-foreground)); }
 [data-goto] { cursor: pointer; }
-
-/* Language switch: a small globe and the language's own name, in a pill like the colour-mode switch. */
-.ds-lang-switch { display: inline-flex !important; flex-direction: row !important; align-items: center; gap: 2px; height: 32px; padding: 0 10px 0 8px; border: 0; border-radius: 999px; background: hsl(var(--muted)); color: hsl(var(--foreground)); font: inherit; flex: none; }
-.ds-lang-switch > svg { width: 14px; height: 14px; color: hsl(var(--muted-foreground)); flex: none; pointer-events: none; }
-.ds-lang-switch > .ds-lang-select { height: 26px; padding: 0 4px; border: 0; border-radius: 999px; background: transparent; color: hsl(var(--foreground)); font: 600 12.5px/1 var(--font-sans); cursor: pointer; appearance: auto; }
-.ds-lang-switch > .ds-lang-select:focus-visible { outline: 2px solid hsl(var(--ring, var(--primary))); outline-offset: 1px; }
-
-/* A small dialog for a form the designs leave open: glass card over a soft wash. */
-.ds-modal-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 24px; background: hsl(var(--foreground) / 0.28); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-.ds-modal { width: min(440px, 100%); max-height: calc(100vh - 48px); overflow-y: auto; padding: calc(24px * var(--space-scale, 1)); }

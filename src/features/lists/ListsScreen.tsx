@@ -294,7 +294,10 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
         {situation === "empty" ? (
           <section data-state="empty">
             {head(true)}
-            <div className="ds-page lists-body">{emptyBlock(t("lists.empty.title"), t("lists.empty.detail"), true)}</div>
+            <div className="ds-page lists-body">
+              {makeListForm}
+              {emptyBlock(t("lists.empty.title"), t("lists.empty.detail"), true)}
+            </div>
           </section>
         ) : null}
         {situation === "error" ? (
