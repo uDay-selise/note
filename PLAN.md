@@ -25,6 +25,6 @@
 - [x] Check and build app
 
 ## T04 Rename or remove a list with its tasks
-- [ ] Rename a list from its menu, with the duplicate-name message (blocks-data-gateway-crud)
-- [ ] Remove a list and its tasks, after the confirm step (blocks-data-gateway-crud)
+- [x] Rename a list from its menu, with the duplicate-name message (blocks-data-gateway-crud)
+- [x] Remove a list and its tasks, after the confirm step (blocks-data-gateway-crud)
 - [x] Check and build app
