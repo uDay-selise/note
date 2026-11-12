@@ -15,7 +15,9 @@ function setup(lists, tasks) {
 }
 
 async function openMenuFor(env, name) {
-  const card = [...document.querySelectorAll("article.list-card")].find((article) => article.querySelector(".list-name")?.textContent === name);
+  const cards = [...document.querySelectorAll("article.list-card")];
+  const card = cards.find((article) => article.querySelector(".list-name")?.textContent === name);
+  console.log("DEBUG card names", cards.map((a) => a.querySelector(".list-name")?.textContent), "target", name, "found", Boolean(card));
   const summary = card.querySelector("details > summary");
   await env.click(summary);
   const details = card.querySelector("details");
