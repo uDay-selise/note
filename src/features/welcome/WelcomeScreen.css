@@ -257,3 +257,9 @@
   line-height: 1.5;
   max-width: 42ch;
 }
+
+/* The language switch sits with the colour-mode switch; on a phone the bar hides it. */
+@media (max-width: 520px) { .wc-bar-actions .wc-lang { display: none !important; } }
+
+/* The line under the button follows the project's sign-up setting. */
+.wc-hint { margin: calc(12px * var(--space-scale, 1)) 0 0; max-width: 46ch; font-size: 13.5px; color: hsl(var(--muted-foreground)); }

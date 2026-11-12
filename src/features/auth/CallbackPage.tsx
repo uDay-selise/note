@@ -17,8 +17,7 @@ export function CallbackPage({ onNavigate }: { onNavigate: (path: string) => voi
 
     completeLogin(window.location.href).then((result) => {
       if (result.ok) {
-        refresh();
-        onNavigate(result.returnTo);
+        void refresh().then(() => onNavigate(result.returnTo));
         return;
       }
 
@@ -32,7 +31,7 @@ export function CallbackPage({ onNavigate }: { onNavigate: (path: string) => voi
         <div className="auth-card">
           <h2>{t("auth.failed")}</h2>
           <Alert tone="error">{error}</Alert>
-          <button className="primary-button auth-submit" onClick={() => onNavigate("/login")}>{t("auth.back")}</button>
+          <button className="primary-button auth-submit" type="button" onClick={() => onNavigate("/login")}>{t("auth.back")}</button>
         </div>
       </div>
     );

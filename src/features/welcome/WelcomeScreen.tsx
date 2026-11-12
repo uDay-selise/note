@@ -3,13 +3,21 @@
 // actions into it and change nothing visual. Studio writes it again only when the design is redrawn;
 // then `git diff` shows what to carry over.
 import type { MouseEvent } from "react";
+import { LanguageSwitch } from "../../app/layout/LanguageSwitch";
 import { ThemeSwitch } from "../../app/layout/ThemeSwitch";
 import { useT } from "../../lib/i18n/LocalizationProvider";
 import "./WelcomeScreen.css";
 
-export function WelcomeScreen({ onSignIn, signUpEnabled, signingIn, error, onNavigate }: { onSignIn: () => void; signUpEnabled: boolean; signingIn: boolean; error?: string; onNavigate?: (path: string) => void }) {
+export type WelcomeScreenProps = {
+  error?: string;
+  onNavigate?: (path: string) => void;
+  onSignIn?: () => void;
+  signingIn?: boolean;
+  signUpEnabled?: boolean;
+};
+
+export function WelcomeScreen({ error, onNavigate, onSignIn, signingIn, signUpEnabled = false }: WelcomeScreenProps) {
   const { t } = useT();
-  const signInLabel = signUpEnabled ? t("welcome.signIn") : t("welcome.signUp");
   const goTo = (path: string) => (event: MouseEvent) => {
     if (!onNavigate) return;
     event.preventDefault();
@@ -20,9 +28,10 @@ export function WelcomeScreen({ onSignIn, signUpEnabled, signingIn, error, onNav
       <main data-screen="welcome">
         <div className="wc-bar">
           <div className="ds-bar">
-            <a href="/" className="wc-brand" data-goto="welcome" aria-label={t("app.name")} onClick={goTo("/")}> <span className="wc-mark" aria-hidden="true">{" "}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1"><path d="M5 13l4 4 10-10" /></svg>{" "}</span> {t("app.name")} </a>
+            <a href="/" className="wc-brand" data-goto="welcome" aria-label={t("welcome.home")} onClick={goTo("/")}> <span className="wc-mark" aria-hidden="true">{" "}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1"><path d="M5 13l4 4 10-10" /></svg>{" "}</span> {t("welcome.brand")} </a>
             <div className="wc-bar-actions">
               <ThemeSwitch />
+              <LanguageSwitch className="wc-lang" />
             </div>
           </div>
         </div>
@@ -36,9 +45,10 @@ export function WelcomeScreen({ onSignIn, signUpEnabled, signingIn, error, onNav
                 <h1 className="wc-title">{t("welcome.title.a")}<br /><em>{t("welcome.title.b")}</em></h1>
                 <p className="wc-lede"><b>{t("welcome.lede.b")}</b> {t("welcome.lede.rest")}</p>
                 <div className="wc-cta">
-                  <button className="ds-btn ds-btn-lg" type="button" disabled={signingIn} onClick={onSignIn}>{signingIn ? "..." : signInLabel}</button>
-                  {error ? <span className="wc-signin-error" role="alert">{error}</span> : null}
+                  <button className="ds-btn ds-btn-lg" type="button" disabled={signingIn} onClick={onSignIn}>{signUpEnabled ? t("welcome.signIn") : t("welcome.signInOnly")}</button>
                 </div>
+                {error ? <p className="ds-error" role="alert" style={{ margin: "calc(12px * var(--space-scale, 1)) 0 0" }}>{error}</p> : null}
+                <p className="wc-hint">{signUpEnabled ? t("welcome.note") : t("welcome.noteSignInOnly")}</p>
                 <ul className="wc-steps">
                   <li><span className="wc-step-dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 7h16M4 12h16M4 17h10" /></svg></span>{t("welcome.step.list")}</li>
                   <li><span className="wc-step-dot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg></span>{t("welcome.step.add")}</li>
@@ -53,22 +63,22 @@ export function WelcomeScreen({ onSignIn, signUpEnabled, signingIn, error, onNav
                       <path d="M4 6h16M4 12h16M4 18h10" />
                     </svg>
                     {" "}
-                    <span data-sample="List#1.name">{t("welcome.preview.list")}</span>
+                    <span>{t("welcome.preview.list")}</span>
                     {" "}
                   </span>
                   {" "}
-                  <span className="ds-badge ds-badge-quiet" data-sample="">{t("welcome.preview.badge")}</span>
+                  <span className="ds-badge ds-badge-quiet">{t("welcome.preview.badge")}</span>
                 </div>
                 <div className="wc-tasks">
                   <div className="wc-task">
                     <span className="wc-box" />
                     {" "}
-                    <span className="wc-task-name" data-sample="Task#2.name">{t("welcome.preview.task1")}</span>
+                    <span className="wc-task-name">{t("welcome.preview.task1")}</span>
                   </div>
                   <div className="wc-task">
                     <span className="wc-box" />
                     {" "}
-                    <span className="wc-task-name" data-sample="Task#3.name">{t("welcome.preview.task2")}</span>
+                    <span className="wc-task-name">{t("welcome.preview.task2")}</span>
                   </div>
                   <div className="wc-task wc-task-done">
                     <span className="wc-box">
@@ -77,7 +87,7 @@ export function WelcomeScreen({ onSignIn, signUpEnabled, signingIn, error, onNav
                       </svg>
                     </span>
                     {" "}
-                    <span className="wc-task-name" data-sample="Task#1.name">{t("welcome.preview.task3")}</span>
+                    <span className="wc-task-name">{t("welcome.preview.task3")}</span>
                   </div>
                 </div>
                 <div className="wc-art-foot">

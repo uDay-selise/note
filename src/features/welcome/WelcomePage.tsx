@@ -23,5 +23,13 @@ export function WelcomePage({ onNavigate }: { onNavigate: (path: string) => void
     }
   }
 
-  return <WelcomeScreen error={error} onNavigate={onNavigate} onSignIn={handleSignIn} signUpEnabled={signUpEnabled} signingIn={signingIn} />;
+  return (
+    <WelcomeScreen
+      error={error}
+      onNavigate={onNavigate}
+      onSignIn={() => void handleSignIn()}
+      signingIn={signingIn}
+      signUpEnabled={signUpEnabled}
+    />
+  );
 }

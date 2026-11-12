@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { BlocksUser } from "@seliseblocks/client";
 import { useAuth } from "../../app/providers/AuthProvider";
 import { blocksClient } from "../../lib/blocks/client";
+import { useT } from "../../lib/i18n/LocalizationProvider";
 
 export function useCurrentUser() {
   const { status } = useAuth();
@@ -28,4 +29,16 @@ export function userInitials(profile?: BlocksUser): string {
   const last = profile.lastName?.[0];
   if (first || last) return `${first ?? ""}${last ?? ""}`.toUpperCase();
   return (profile.email?.[0] ?? "?").toUpperCase();
+}
+
+/** The signed-in person as the top bar shows them. */
+export function usePerson() {
+  const { t } = useT();
+  const { data } = useCurrentUser();
+  const profile = data?.data;
+  return {
+    initials: userInitials(profile),
+    name: userDisplayName(profile) || t("header.signedIn"),
+    role: t("header.signedIn")
+  };
 }

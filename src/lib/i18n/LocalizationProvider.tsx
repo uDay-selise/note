@@ -21,28 +21,34 @@ const LANGUAGE_KEY = "blocks-app:language";
 // This app's words live in its own translation module.
 const MODULES = ["app-3b0164d5"];
 
-function normalizeLanguage(raw: Record<string, unknown>): LocalizationLanguage {
-  const code = raw.languageCode ?? raw.code ?? raw.culture ?? "en";
-  const name = raw.languageName ?? raw.displayName ?? raw.name ?? String(code);
-  return { code: String(code), isDefault: Boolean(raw.isDefault), name: String(name) };
+// Exported for the build's checks: a value the service has no text for comes
+// back as a marker like "[ KEY MISSING ]", and the app's own words must win.
+export function pickText(cloud: string | undefined, fallback: string | undefined, key: string): string {
+  if (cloud && !cloud.trim().startsWith("[")) return cloud;
+  if (fallback && !fallback.trim().startsWith("[")) return fallback;
+  return key;
 }
 
 export function LocalizationProvider({ children }: { children: ReactNode }) {
   const [languageOverride, setLanguageOverride] = useState(() => localStorage.getItem(LANGUAGE_KEY) ?? "");
-
+  // The project's languages are the app's own fixed list; the service is
+  // only asked for its default so a first visit knows where to start.
   const languagesQuery = useQuery({
     queryFn: () => blocksClient.localization.languages(),
     queryKey: ["i18n", "languages"],
     staleTime: 5 * 60_000
   });
 
-  const languages = useMemo(() => (Array.isArray(languagesQuery.data) ? languagesQuery.data : []).map(normalizeLanguage), [languagesQuery.data]);
-  const offered = useMemo(() => (languages.length ? appLanguages.filter((entry) => languages.some((languageEntry) => languageEntry.code === entry.code)) : appLanguages), [languages]);
-  // Until /Language/Gets resolves (or on a tenant with none configured), fall
-  // back to "en" -- it must still match a real languageCode for translations
-  // to resolve, so this is a startup default rather than a guaranteed hit.
-  const defaultLanguage = languages.find((entry) => entry.isDefault)?.code ?? languages[0]?.code ?? "en";
-  const language = languageOverride || defaultLanguage;
+  const serviceLanguages = useMemo(() => (Array.isArray(languagesQuery.data) ? languagesQuery.data : []), [languagesQuery.data]);
+  const defaultLanguage = useMemo(() => {
+    const serviceDefault = serviceLanguages.find((entry) => Boolean(entry?.isDefault))?.languageCode;
+    if (appLanguages.some((entry) => entry.code === serviceDefault)) return String(serviceDefault);
+    return appLanguages[0]?.code ?? "en-US";
+  }, [serviceLanguages]);
+  const storedOverride = appLanguages.some((entry) => entry.code === languageOverride) ? languageOverride : "";
+  // No saved choice: follow the browser's language when the project has it.
+  const browserMatch = appLanguages.find((entry) => entry.code.toLowerCase().split("-")[0] === navigator.language.toLowerCase().split("-")[0]);
+  const language = storedOverride || browserMatch?.code || defaultLanguage;
 
   function setLanguage(next: string) {
     localStorage.setItem(LANGUAGE_KEY, next);
@@ -74,15 +80,14 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<LocalizationValue>(() => ({
     language,
-    languages: offered.map((entry) => ({ code: entry.code, isDefault: entry.code === defaultLanguage, name: entry.label })),
+    languages: appLanguages.map((entry) => ({ code: entry.code, isDefault: entry.code === defaultLanguage, name: entry.label })),
     setLanguage,
     t: (key, values) => {
-      const cloud = cloudDictionary[key];
-      const text = cloud && !cloud.trim().startsWith("[") ? cloud : defaultDictionary[key] ?? (typeof values === "string" ? values : undefined) ?? key;
+      const text = pickText(cloudDictionary[key], defaultDictionary[key], typeof values === "string" ? values : key);
       if (!values || typeof values === "string") return text;
       return Object.entries(values).reduce((out, [name, value]) => out.split(`{${name}}`).join(String(value)), text);
     }
-  }), [cloudDictionary, defaultLanguage, language, offered]);
+  }), [cloudDictionary, defaultLanguage, language]);
 
   return <LocalizationContext.Provider value={value}>{children}</LocalizationContext.Provider>;
 }

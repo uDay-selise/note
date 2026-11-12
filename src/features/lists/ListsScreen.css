@@ -131,3 +131,6 @@
 :where(.studio-screen-lists) .add-task {
   padding: calc(12px * var(--space-scale, 1)) 0 calc(4px * var(--space-scale, 1));
 }
+
+/* A task's name opens its details; drawn as the design's link, it is a button. */
+:where(.studio-screen-lists) .task-name-button { background: none; border: 0; padding: calc(4px * var(--space-scale, 1)) 0; font: inherit; text-align: left; cursor: pointer; }

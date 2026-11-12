@@ -1,73 +1,122 @@
 import { blocksClient } from "../../lib/blocks/client";
 
-export type ListRecord = { itemId?: string; name: string; CreatedDate?: string; LastUpdatedDate?: string };
-export type TaskRecord = { itemId?: string; name: string; list: string; done: boolean; CreatedDate?: string };
+export type ListRecord = {
+  itemId: string;
+  name: string;
+  createdDate: string;
+};
 
-export type GatewayAnswer = { acknowledged?: boolean; errors?: unknown; itemIds?: string[]; message?: string };
+export type TaskRecord = {
+  itemId: string;
+  name: string;
+  list: string;
+  done: boolean;
+  createdDate: string;
+};
 
-const lists = blocksClient.data.collection<ListRecord>("List", { fields: ["name", "CreatedDate"] });
-const tasks = blocksClient.data.collection<TaskRecord>("Task", { fields: ["name", "list", "done", "CreatedDate"] });
+export type SaveAnswer = {
+  ok: boolean;
+  /** The gateway's own reason, when it refused a save that still answered 200. */
+  reason?: string;
+  itemId?: string;
+};
 
-type Answer = { acknowledged?: boolean; errors?: unknown; message?: string };
+type RawAnswer = {
+  acknowledged?: boolean;
+  errors?: unknown;
+  message?: string;
+  itemId?: string;
+  itemIds?: string[];
+  data?: Record<string, { items?: Record<string, unknown>[] }>;
+};
 
-export function refusalReason(...answers: unknown[]): string | undefined {
-  for (const answer of answers) {
-    const record = (answer ?? {}) as Answer;
-    if (record.errors) {
-      const text = typeof record.errors === "string" ? record.errors : JSON.stringify(record.errors);
-      if (text && text !== "null" && text !== "[]" && text !== "{}") return record.message || text;
-    }
-    if (record.acknowledged === false) return record.message || "The save was refused.";
+const lists = blocksClient.data.collection<Record<string, unknown>>("List", { fields: ["name", "CreatedDate"] });
+const tasks = blocksClient.data.collection<Record<string, unknown>>("Task", { fields: ["name", "list", "done", "CreatedDate"] });
+
+function textOf(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function recordId(raw: Record<string, unknown>): string {
+  return textOf(raw.ItemId ?? raw.itemId);
+}
+
+function itemsOf(answer: RawAnswer, queryName: string): Record<string, unknown>[] {
+  return answer.data?.[queryName]?.items ?? [];
+}
+
+function refusal(answer: RawAnswer): string | undefined {
+  if (answer.errors) {
+    const text = typeof answer.errors === "string" ? answer.errors : JSON.stringify(answer.errors);
+    if (text && text !== "null" && text !== "[]" && text !== "{}") return answer.message || text;
   }
+  if (answer.acknowledged === false) return answer.message || "The save was refused.";
   return undefined;
 }
 
-export function itemIdOf(record: { itemId?: string }): string {
-  if (!record.itemId) throw new Error("This record has no id.");
-  return record.itemId;
+function toSaveAnswer(answer: unknown): SaveAnswer {
+  const raw = (answer ?? {}) as RawAnswer;
+  const reason = refusal(raw);
+  if (reason) return { ok: false, reason };
+  return { ok: true, itemId: raw.itemId ?? raw.itemIds?.[0] };
 }
 
-type ListAnswer = { data?: { getLists?: { items?: ListRecord[] } } };
-
-export async function fetchLists(): Promise<ListRecord[]> {
-  const answer = (await lists.list({ pageNo: 1, pageSize: 50, sort: { CreatedDate: -1 } })) as GatewayAnswer & ListAnswer;
-  if (answer.errors) return [];
-  return answer.data?.getLists?.items ?? [];
+function toList(raw: Record<string, unknown>): ListRecord {
+  return { createdDate: textOf(raw.CreatedDate ?? raw.createdDate), itemId: recordId(raw), name: textOf(raw.name) };
 }
 
-type TaskAnswer = { data?: { getTasks?: { items?: TaskRecord[] } } };
-
-export async function fetchTasks(): Promise<TaskRecord[]> {
-  const answer = (await tasks.list({ pageNo: 1, pageSize: 500, sort: { CreatedDate: 1 } })) as GatewayAnswer & TaskAnswer;
-  if (answer.errors) return [];
-  return answer.data?.getTasks?.items ?? [];
+function toTask(raw: Record<string, unknown>): TaskRecord {
+  return { createdDate: textOf(raw.CreatedDate ?? raw.createdDate), done: Boolean(raw.done), itemId: recordId(raw), list: textOf(raw.list), name: textOf(raw.name) };
 }
 
-export async function createList(name: string): Promise<GatewayAnswer> {
-  return (await lists.create({ name })) as GatewayAnswer;
+export type FetchResult<T> = { ok: true; items: T[] } | { ok: false };
+
+export async function fetchLists(): Promise<FetchResult<ListRecord>> {
+  const answer = (await lists.list({ pageNo: 1, pageSize: 50, sort: { CreatedDate: -1 } })) as unknown as RawAnswer;
+  const reason = refusal(answer);
+  if (reason) return { ok: false };
+  return { items: itemsOf(answer, "getLists").map(toList), ok: true };
 }
 
-export async function renameList(id: string, name: string): Promise<GatewayAnswer> {
-  return (await lists.update(id, { name })) as GatewayAnswer;
-}
-
-export async function removeList(id: string): Promise<GatewayAnswer> {
-  return (await lists.delete(id)) as GatewayAnswer;
+export async function fetchTasks(): Promise<FetchResult<TaskRecord>> {
+  const answer = (await tasks.list({ pageNo: 1, pageSize: 500, sort: { CreatedDate: 1 } })) as unknown as RawAnswer;
+  const reason = refusal(answer);
+  if (reason) return { ok: false };
+  return { items: itemsOf(answer, "getTasks").map(toTask), ok: true };
 }
 
 export async function fetchTask(id: string): Promise<TaskRecord | undefined> {
-  const answer = (await tasks.get(id)) as TaskAnswer;
-  return answer.data?.getTasks?.items?.[0];
+  const answer = (await tasks.get(id)) as unknown as RawAnswer;
+  if (refusal(answer)) return undefined;
+  const raw = itemsOf(answer, "getTasks")[0];
+  return raw ? toTask(raw) : undefined;
 }
 
-export async function createTask(name: string, list: string): Promise<GatewayAnswer> {
-  return (await tasks.create({ name, list, done: false })) as GatewayAnswer;
+export function createList(name: string): Promise<SaveAnswer> {
+  return lists.create({ name }).then(toSaveAnswer);
 }
 
-export async function updateTask(id: string, changes: Partial<Pick<TaskRecord, "name" | "list" | "done">>): Promise<GatewayAnswer> {
-  return (await tasks.update(id, changes)) as GatewayAnswer;
+export function renameList(id: string, name: string): Promise<SaveAnswer> {
+  return lists.update(id, { name }).then(toSaveAnswer);
 }
 
-export async function removeTasks(listId: string): Promise<GatewayAnswer> {
-  return (await tasks.delete(listId)) as GatewayAnswer;
+export function removeList(id: string): Promise<SaveAnswer> {
+  return lists.delete(id).then(toSaveAnswer);
+}
+
+export function createTask(name: string, list: string): Promise<SaveAnswer> {
+  return tasks.create({ done: false, list, name }).then(toSaveAnswer);
+}
+
+export function updateTask(id: string, changes: Partial<Pick<TaskRecord, "name" | "list" | "done">>): Promise<SaveAnswer> {
+  return tasks.update(id, changes).then(toSaveAnswer);
+}
+
+export function removeTask(id: string): Promise<SaveAnswer> {
+  return tasks.delete(id).then(toSaveAnswer);
+}
+
+/** One list's tasks, not-done first and each group in the order it was added. */
+export function tasksOfList(all: TaskRecord[], listId: string): TaskRecord[] {
+  return all.filter((task) => task.list === listId).sort((a, b) => Number(a.done) - Number(b.done));
 }

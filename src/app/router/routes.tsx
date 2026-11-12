@@ -5,6 +5,7 @@ import { ErrorPage } from "../../features/auth/ErrorPage";
 import { NotFoundPage } from "../../features/auth/NotFoundPage";
 import { ListsPage } from "../../features/lists/ListsPage";
 import { WelcomePage } from "../../features/welcome/WelcomePage";
+import { TaskPage } from "../../features/task/TaskPage";
 
 export function AppRouter() {
   const [path, setPath] = useState(() => window.location.pathname);
@@ -43,7 +44,20 @@ export function AppRouter() {
   }
 
   if (path === "/") {
-    return <WelcomePage onNavigate={navigate} />;
+    return (
+      <RedirectIfAuthenticated onNavigate={navigate}>
+        <WelcomePage onNavigate={navigate} />
+      </RedirectIfAuthenticated>
+    );
+  }
+
+  const taskMatch = path.match(/^\/tasks\/([^/]+)$/);
+  if (taskMatch) {
+    return (
+      <RequireAuth currentPath={path} onNavigate={navigate}>
+        <TaskPage taskId={decodeURIComponent(taskMatch[1] ?? "")} onNavigate={navigate} />
+      </RequireAuth>
+    );
   }
 
   if (path === "/lists") {
