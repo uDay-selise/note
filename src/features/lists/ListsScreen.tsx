@@ -26,11 +26,13 @@ export type ListsScreenProps = {
   onToggleTask: (task: TaskRecord) => void;
   onAddTask: (listId: string, name: string) => Promise<string | undefined>;
   onMakeList: (name: string) => Promise<string | undefined>;
+  onRenameList: (listId: string, name: string) => Promise<string | undefined>;
+  onRemoveList: (listId: string) => Promise<string | undefined>;
   /** A message the last save left, shown under the form it was made in. */
   notice?: { where: "list" | "task"; text: string };
 };
 
-export function ListsScreen({ situation = "normal", onNavigate, person, onSignOut, lists, tasks, onRetry, onOpenTask, onToggleTask, onAddTask, onMakeList, notice }: ListsScreenProps) {
+export function ListsScreen({ situation = "normal", onNavigate, person, onSignOut, lists, tasks, onRetry, onOpenTask, onToggleTask, onAddTask, onMakeList, onRenameList, onRemoveList, notice }: ListsScreenProps) {
   const { t } = useT();
   const [formOpen, setFormOpen] = useState(false);
   const [name, setName] = useState("");
@@ -41,6 +43,14 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
   const [taskName, setTaskName] = useState("");
   const [savingTask, setSavingTask] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | undefined>();
+  const [renaming, setRenaming] = useState<string | undefined>();
+  const [renameName, setRenameName] = useState("");
+  const [renameError, setRenameError] = useState<string | undefined>();
+  const [savingRename, setSavingRename] = useState(false);
+  const [removing, setRemoving] = useState<string | undefined>();
+  const [removeError, setRemoveError] = useState<string | undefined>();
+  const [savingRemove, setSavingRemove] = useState(false);
+  const renameRef = useRef<HTMLInputElement>(null);
   const [taskError, setTaskError] = useState<string | undefined>();
   const nameRef = useRef<HTMLInputElement>(null);
   const taskRef = useRef<HTMLInputElement>(null);
@@ -51,6 +61,9 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
   useEffect(() => {
     if (taskFormIn) taskRef.current?.focus();
   }, [taskFormIn]);
+  useEffect(() => {
+    if (renaming) renameRef.current?.focus();
+  }, [renaming]);
   useEffect(() => {
     function close(event: Event) {
       if (event instanceof KeyboardEvent && event.key !== "Escape") return;
@@ -110,6 +123,68 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
     setTaskFormList(listId);
     setTaskName("");
     setTaskError(undefined);
+  }
+
+  function startRename(listId: string) {
+    const list = lists.find((entry) => entry.itemId === listId);
+    setOpenMenu(undefined);
+    setRenaming(listId);
+    setRenameName(list?.name ?? "");
+    setRenameError(undefined);
+  }
+
+  function cancelRename() {
+    setRenaming(undefined);
+    setRenameName("");
+    setRenameError(undefined);
+  }
+
+  async function submitRename(event: FormEvent) {
+    event.preventDefault();
+    if (!renaming) return;
+    const trimmed = renameName.trim();
+    setRenameError(undefined);
+    if (!trimmed) {
+      setRenameError(t("lists.form.nameRequired"));
+      return;
+    }
+    if (trimmed.length > 60) {
+      setRenameError(t("lists.form.hint"));
+      return;
+    }
+    setSavingRename(true);
+    const reason = await onRenameList(renaming, trimmed);
+    setSavingRename(false);
+    if (reason) {
+      setRenameError(reason);
+      return;
+    }
+    setRenaming(undefined);
+    setRenameName("");
+  }
+
+  function startRemove(listId: string) {
+    setOpenMenu(undefined);
+    setRemoving(listId);
+    setRemoveError(undefined);
+  }
+
+  function cancelRemove() {
+    setRemoving(undefined);
+    setRemoveError(undefined);
+  }
+
+  async function confirmRemove() {
+    if (!removing) return;
+    setRemoveError(undefined);
+    setSavingRemove(true);
+    const reason = await onRemoveList(removing);
+    setSavingRemove(false);
+    if (reason) {
+      setRemoveError(reason);
+      return;
+    }
+    setRemoving(undefined);
   }
 
   function cancelTask() {
@@ -304,9 +379,9 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
                             </svg>
                           </summary>
                           <div className="ds-menu-list" onPointerDown={(event) => event.stopPropagation()}>
-                            <button type="button" onClick={() => undefined}>{t("lists.renameList")}</button>
+                            <button type="button" onClick={() => startRename(list.itemId)}>{t("lists.renameList")}</button>
                             {" "}
-                            <button type="button" onClick={() => undefined}>{t("lists.removeList")}</button>
+                            <button type="button" onClick={() => startRemove(list.itemId)}>{t("lists.removeList")}</button>
                           </div>
                         </details>
                       </div>
@@ -336,6 +411,42 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
                 })}
               </div>
               {notice?.where === "task" ? <div className="ds-notice ds-notice-success" style={{ marginTop: "calc(16px * var(--space-scale, 1))" }}>{notice.text}</div> : null}
+            </div>
+          </div>
+        ) : null}
+        {renaming ? (
+          <div className="ds-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) cancelRename(); }}>
+            <div className="ds-card ds-modal" role="dialog" aria-modal="true" aria-labelledby="rename-list-title">
+              <h2 className="ds-h2" id="rename-list-title">{t("lists.renameTitle")}</h2>
+              <p className="ds-muted" style={{ margin: "calc(4px * var(--space-scale, 1)) 0 calc(16px * var(--space-scale, 1))", fontSize: "14px" }}>{t("lists.renameDetail")}</p>
+              <form className="ds-form" onSubmit={(event) => void submitRename(event)} noValidate>
+                <div className="ds-field">
+                  <label className="ds-label" htmlFor="rename-list-name">{t("lists.form.label")}</label>
+                  {" "}
+                  <input className="ds-input" id="rename-list-name" ref={renameRef} type="text" maxLength={60} value={renameName} onChange={(event) => { setRenameName(event.target.value); setRenameError(undefined); }} aria-invalid={renameError ? true : undefined} />
+                  {" "}
+                  {renameError ? <span className="ds-error" role="alert">{renameError}</span> : <span className="ds-hint">{t("lists.form.hint")}</span>}
+                </div>
+                <div className="ds-form-actions">
+                  <button className="ds-btn ds-btn-secondary" type="button" onClick={cancelRename}>{t("lists.form.cancel")}</button>
+                  {" "}
+                  <button className="ds-btn" type="submit" disabled={savingRename}>{t("lists.renameSave")}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : null}
+        {removing ? (
+          <div className="ds-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) cancelRemove(); }}>
+            <div className="ds-card ds-modal" role="dialog" aria-modal="true" aria-labelledby="remove-list-title">
+              <h2 className="ds-h2" id="remove-list-title">{t("lists.removeTitle")}</h2>
+              <p className="ds-muted" style={{ margin: "calc(4px * var(--space-scale, 1)) 0 calc(16px * var(--space-scale, 1))", fontSize: "14px" }}>{t("lists.removeConfirm")}</p>
+              {removeError ? <p className="ds-error" role="alert" style={{ margin: "0 0 calc(12px * var(--space-scale, 1))" }}>{removeError}</p> : null}
+              <div className="ds-form-actions">
+                <button className="ds-btn ds-btn-secondary" type="button" onClick={cancelRemove}>{t("lists.form.cancel")}</button>
+                {" "}
+                <button className="ds-btn ds-btn-danger" type="button" disabled={savingRemove} onClick={() => void confirmRemove()}>{t("lists.remove")}</button>
+              </div>
             </div>
           </div>
         ) : null}

@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useT } from "../../lib/i18n/LocalizationProvider";
 import { useCurrentUser, userInitials } from "../profile/useCurrentUser";
-import { createList, createTask, fetchLists, fetchTasks, updateTask } from "./listsApi";
+import { createList, createTask, fetchLists, fetchTasks, removeList, removeTask, renameList, tasksOfList, updateTask } from "./listsApi";
 import type { TaskRecord } from "./listsApi";
 import { ListsScreen } from "./ListsScreen";
 import type { ListsScreenSituation } from "./ListsScreen";
@@ -53,6 +53,40 @@ export function ListsPage({ onNavigate }: { onNavigate: (path: string) => void }
     }
   }
 
+  async function rename(listId: string, name: string): Promise<string | undefined> {
+    setNotice(undefined);
+    const trimmed = name.trim();
+    if (lists.some((list) => list.itemId !== listId && list.name.trim().toLowerCase() === trimmed.toLowerCase())) return t("lists.form.duplicate");
+    try {
+      const answer = await renameList(listId, trimmed);
+      if (!answer.ok) return t("lists.form.failed");
+      refresh();
+      setNotice({ text: t("lists.renameSaved"), where: "list" });
+      return undefined;
+    } catch (caught) {
+      console.error("The list couldn't be renamed:", caught);
+      return t("lists.form.failed");
+    }
+  }
+
+  async function remove(listId: string): Promise<string | undefined> {
+    setNotice(undefined);
+    try {
+      for (const task of tasksOfList(tasks, listId)) {
+        const answer = await removeTask(task.itemId);
+        if (!answer.ok) return t("lists.removeFailed");
+      }
+      const answer = await removeList(listId);
+      if (!answer.ok) return t("lists.removeFailed");
+      refresh();
+      setNotice({ text: t("lists.removeSaved"), where: "list" });
+      return undefined;
+    } catch (caught) {
+      console.error("The list couldn't be removed:", caught);
+      return t("lists.removeFailed");
+    }
+  }
+
   async function addTask(listId: string, name: string): Promise<string | undefined> {
     setNotice(undefined);
     if (tasks.length >= 500) return t("lists.taskForm.limit");
@@ -90,6 +124,8 @@ export function ListsPage({ onNavigate }: { onNavigate: (path: string) => void }
       notice={notice}
       onAddTask={addTask}
       onMakeList={makeList}
+      onRemoveList={remove}
+      onRenameList={rename}
       onNavigate={onNavigate}
       onOpenTask={(id) => onNavigate(`/tasks/${id}`)}
       onRetry={() => {
