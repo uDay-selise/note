@@ -18,10 +18,10 @@
 - [x] Check and build app
 
 ## T03 Open a task, rename it or move it
-- [ ] Task details: name, list and done or not done (blocks-data-gateway-crud)
-- [ ] A task that isn't yours shows its own message (blocks-data-gateway-crud)
-- [ ] Mark a task done or not done from its details (blocks-data-gateway-crud)
-- [ ] Edit a task's name, or move it to another list (blocks-data-gateway-crud)
+- [x] Task details: name, list and done or not done (blocks-data-gateway-crud)
+- [x] A task that isn't yours shows its own message (blocks-data-gateway-crud)
+- [x] Mark a task done or not done from its details (blocks-data-gateway-crud)
+- [x] Edit a task's name, or move it to another list (blocks-data-gateway-crud)
 - [x] Check and build app
 
 ## T04 Rename or remove a list with its tasks

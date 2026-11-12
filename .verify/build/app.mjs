@@ -6266,6 +6266,7 @@ var defaultDictionary = {
 	"lists.taskForm.title": "Add a task",
 	"lists.taskForm.detail": "Give it a short name you'll know at a glance.",
 	"lists.taskForm.label": "Task name",
+	"lists.taskForm.listLabel": "List",
 	"lists.taskForm.nameHint": "Up to 200 characters.",
 	"lists.taskForm.saved": "Task added to {list}.",
 	"lists.taskForm.cancel": "Cancel",
@@ -6797,9 +6798,9 @@ async function fetchTasks() {
 }
 async function fetchTask(id) {
 	const answer = await tasks.get(id);
-	if (refusal(answer)) return void 0;
+	if (refusal(answer)) return null;
 	const raw = itemsOf(answer, "getTasks")[0];
-	return raw ? toTask(raw) : void 0;
+	return raw ? toTask(raw) : null;
 }
 function createList(name) {
 	return lists.create({ name }).then(toSaveAnswer);
@@ -7048,6 +7049,7 @@ function ListsScreen({ situation = "normal", onNavigate, person, onSignOut, list
 	const [saving, setSaving] = useState(false);
 	const [formError, setFormError] = useState();
 	const [taskFormIn, setTaskFormIn] = useState();
+	const [taskFormList, setTaskFormList] = useState("");
 	const [taskName, setTaskName] = useState("");
 	const [savingTask, setSavingTask] = useState(false);
 	const [openMenu, setOpenMenu] = useState();
@@ -7106,11 +7108,13 @@ function ListsScreen({ situation = "normal", onNavigate, person, onSignOut, list
 	}
 	function startTask(listId) {
 		setTaskFormIn(listId);
+		setTaskFormList(listId);
 		setTaskName("");
 		setTaskError(void 0);
 	}
 	function cancelTask() {
 		setTaskFormIn(void 0);
+		setTaskFormList("");
 		setTaskName("");
 		setTaskError(void 0);
 	}
@@ -7128,7 +7132,7 @@ function ListsScreen({ situation = "normal", onNavigate, person, onSignOut, list
 			return;
 		}
 		setSavingTask(true);
-		const reason = await onAddTask(taskFormIn, trimmed);
+		const reason = await onAddTask(taskFormList, trimmed);
 		setSavingTask(false);
 		if (reason) {
 			setTaskError(reason);
@@ -7653,56 +7657,83 @@ function ListsScreen({ situation = "normal", onNavigate, person, onSignOut, list
 								className: "ds-form",
 								onSubmit: (event) => void submitTask(event),
 								noValidate: true,
-								children: [/* @__PURE__ */ jsxs("div", {
-									className: "ds-field",
-									children: [
-										/* @__PURE__ */ jsx("label", {
-											className: "ds-label",
-											htmlFor: "task-name",
-											children: t("lists.taskForm.label")
-										}),
-										" ",
-										/* @__PURE__ */ jsx("input", {
-											className: "ds-input",
-											id: "task-name",
-											ref: taskRef,
-											type: "text",
-											maxLength: 200,
-											value: taskName,
-											onChange: (event) => {
-												setTaskName(event.target.value);
-												setTaskError(void 0);
-											},
-											"aria-invalid": taskError ? true : void 0
-										}),
-										" ",
-										taskError ? /* @__PURE__ */ jsx("span", {
-											className: "ds-error",
-											role: "alert",
-											children: taskError
-										}) : /* @__PURE__ */ jsx("span", {
-											className: "ds-hint",
-											children: t("lists.taskForm.nameHint")
-										})
-									]
-								}), /* @__PURE__ */ jsxs("div", {
-									className: "ds-form-actions",
-									children: [
-										/* @__PURE__ */ jsx("button", {
-											className: "ds-btn ds-btn-secondary",
-											type: "button",
-											onClick: cancelTask,
-											children: t("lists.taskForm.cancel")
-										}),
-										" ",
-										/* @__PURE__ */ jsx("button", {
-											className: "ds-btn",
-											type: "submit",
-											disabled: savingTask,
-											children: t("lists.taskForm.submit")
-										})
-									]
-								})]
+								children: [
+									/* @__PURE__ */ jsxs("div", {
+										className: "ds-field",
+										children: [
+											/* @__PURE__ */ jsx("label", {
+												className: "ds-label",
+												htmlFor: "task-name",
+												children: t("lists.taskForm.label")
+											}),
+											" ",
+											/* @__PURE__ */ jsx("input", {
+												className: "ds-input",
+												id: "task-name",
+												ref: taskRef,
+												type: "text",
+												maxLength: 200,
+												value: taskName,
+												onChange: (event) => {
+													setTaskName(event.target.value);
+													setTaskError(void 0);
+												},
+												"aria-invalid": taskError ? true : void 0
+											}),
+											" ",
+											taskError ? /* @__PURE__ */ jsx("span", {
+												className: "ds-error",
+												role: "alert",
+												children: taskError
+											}) : /* @__PURE__ */ jsx("span", {
+												className: "ds-hint",
+												children: t("lists.taskForm.nameHint")
+											})
+										]
+									}),
+									/* @__PURE__ */ jsxs("div", {
+										className: "ds-field",
+										children: [
+											/* @__PURE__ */ jsx("label", {
+												className: "ds-label",
+												htmlFor: "task-form-list",
+												children: t("lists.taskForm.listLabel")
+											}),
+											" ",
+											/* @__PURE__ */ jsx("select", {
+												className: "ds-select",
+												id: "task-form-list",
+												value: taskFormList,
+												onChange: (event) => {
+													setTaskFormList(event.target.value);
+													setTaskError(void 0);
+												},
+												children: lists.map((list) => /* @__PURE__ */ jsx("option", {
+													value: list.itemId,
+													children: list.name
+												}, list.itemId))
+											})
+										]
+									}),
+									/* @__PURE__ */ jsxs("div", {
+										className: "ds-form-actions",
+										children: [
+											/* @__PURE__ */ jsx("button", {
+												className: "ds-btn ds-btn-secondary",
+												type: "button",
+												onClick: cancelTask,
+												children: t("lists.taskForm.cancel")
+											}),
+											" ",
+											/* @__PURE__ */ jsx("button", {
+												className: "ds-btn",
+												type: "submit",
+												disabled: savingTask,
+												children: t("lists.taskForm.submit")
+											})
+										]
+									})
+								]
 							})
 						]
 					})
@@ -7748,7 +7779,7 @@ function ListsPage({ onNavigate }) {
 	const tasks = tasksAnswer?.ok ? tasksAnswer.items : [];
 	const loading = listsQuery.isLoading || tasksQuery.isLoading;
 	const failed = listsAnswer?.ok === false || tasksAnswer?.ok === false;
-	const situation = loading ? "loading" : failed ? "error" : lists.length === 0 ? "empty" : "normal";
+	const situation = loading ? "loading" : failed ? "error" : lists.length === 0 ? "no-lists" : "normal";
 	function refresh() {
 		queryClient.invalidateQueries({ queryKey: ["lists"] });
 		queryClient.invalidateQueries({ queryKey: ["tasks"] });
@@ -8137,7 +8168,7 @@ function WelcomePage({ onNavigate }) {
 	});
 }
 // src/features/task/TaskScreen.tsx
-function TaskScreen({ situation = "normal", onNavigate, person, onSignOut, task, lists, listName, errorMessage, savedIn, onRetry, onToggle, onEdit }) {
+function TaskScreen({ situation = "normal", onNavigate, person, onSignOut, task, lists, listName, errorMessage, onRetry, onToggle, onEdit }) {
 	const { t } = useT();
 	const [draft, setDraft] = useState({
 		list: "",
@@ -8145,12 +8176,14 @@ function TaskScreen({ situation = "normal", onNavigate, person, onSignOut, task,
 	});
 	const [saving, setSaving] = useState(false);
 	const [formError, setFormError] = useState();
+	const [savedIn, setSavedIn] = useState();
+	const editedRef = useRef(false);
 	useEffect(() => {
 		setDraft({
 			list: task?.list ?? "",
 			name: task?.name ?? ""
 		});
-		setFormError(void 0);
+		if (!editedRef.current) setFormError(void 0);
 	}, [task]);
 	const goTo = (path) => (event) => {
 		if (!onNavigate) return;
@@ -8175,7 +8208,13 @@ function TaskScreen({ situation = "normal", onNavigate, person, onSignOut, task,
 			list: draft.list
 		});
 		setSaving(false);
-		if (reason) setFormError(reason);
+		editedRef.current = true;
+		if (reason) {
+			setSavedIn(void 0);
+			setFormError(reason);
+			return;
+		}
+		setSavedIn(lists.find((list) => list.itemId === draft.list)?.name ?? "");
 	}
 	const name = draft.name || task?.name || "";
 	const statusBadge = task?.done ? /* @__PURE__ */ jsxs("span", {
@@ -8692,7 +8731,7 @@ function TaskPage({ taskId, onNavigate }) {
 		queryFn: fetchLists,
 		queryKey: ["lists"]
 	});
-	const task = taskQuery.data;
+	const task = taskQuery.data ?? void 0;
 	const lists = listsQuery.data?.ok ? listsQuery.data.items : [];
 	const profile = me.data?.data;
 	const person = {

@@ -2,7 +2,7 @@
 // Its markup, classes and CSS are the design's: wire real data, translation keys, routes and SDK
 // actions into it and change nothing visual. Studio writes it again only when the design is redrawn;
 // then `git diff` shows what to carry over.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent, MouseEvent } from "react";
 import { HeaderPart } from "../../app/layout/HeaderPart";
 import type { HeaderPerson } from "../../app/layout/HeaderPart";
@@ -24,22 +24,22 @@ export type TaskScreenProps = {
   lists: ListRecord[];
   listName: string;
   errorMessage?: string;
-  /** The name of the list the last save put the task in. */
-  savedIn?: string;
   onRetry: () => void;
   onToggle: () => void;
   onEdit: (draft: TaskDraft) => Promise<string | undefined>;
 };
 
-export function TaskScreen({ situation = "normal", onNavigate, person, onSignOut, task, lists, listName, errorMessage, savedIn, onRetry, onToggle, onEdit }: TaskScreenProps) {
+export function TaskScreen({ situation = "normal", onNavigate, person, onSignOut, task, lists, listName, errorMessage, onRetry, onToggle, onEdit }: TaskScreenProps) {
   const { t } = useT();
   const [draft, setDraft] = useState<TaskDraft>({ list: "", name: "" });
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | undefined>();
+  const [savedIn, setSavedIn] = useState<string | undefined>();
+  const editedRef = useRef(false);
 
   useEffect(() => {
     setDraft({ list: task?.list ?? "", name: task?.name ?? "" });
-    setFormError(undefined);
+    if (!editedRef.current) setFormError(undefined);
   }, [task]);
 
   const goTo = (path: string) => (event: MouseEvent) => {
@@ -63,7 +63,13 @@ export function TaskScreen({ situation = "normal", onNavigate, person, onSignOut
     setSaving(true);
     const reason = await onEdit({ name: trimmed, list: draft.list });
     setSaving(false);
-    if (reason) setFormError(reason);
+    editedRef.current = true;
+    if (reason) {
+      setSavedIn(undefined);
+      setFormError(reason);
+      return;
+    }
+    setSavedIn(lists.find((list) => list.itemId === draft.list)?.name ?? "");
   }
 
   const name = draft.name || task?.name || "";

@@ -88,11 +88,12 @@ state.tasks = [{ ItemId: "tm", name: "Buy milk", list: "l1", done: false, Create
 {
   const dom = makeEnvMk("/tasks/t1");
   const env = await mount(dom);
-  await env.settle(() => env.text().includes("Not done yet"));
-  console.log("DEBUG buttons", [...document.querySelectorAll("button")].map((b) => JSON.stringify(b.textContent.trim())));
+  await env.settle(() => env.text().includes("Buy milk"));
+  console.log("DEBUG TEXT", env.text().slice(0, 220));
   await env.click(env.byText("button", "Mark done"));
   await env.settle(() => env.text().includes("Mark not done"));
   const afterDone = env.text();
+  console.log("DEBUG after done saved", state.tasks.find((t) => t.ItemId === "tm")?.done, "text has markNotDone", afterDone.includes("Mark not done"), "has notDoneYet", afterDone.includes("Not done yet"));
   out.markDone = {
     saved: state.tasks.find((task) => task.ItemId === "tm")?.done === true,
     showsDone: afterDone.includes("Mark not done") && !afterDone.includes("Not done yet")

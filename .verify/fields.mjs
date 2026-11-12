@@ -19,6 +19,7 @@ export function installFetch() {
     state.sent.push(body);
     const answer = (p, s = 200) => new Response(JSON.stringify(p), { status: s, headers: { "content-type": "application/json" } });
     const input = () => { try { return JSON.parse(body).variables?.input ?? {}; } catch { return {}; } };
+    if (body.includes("getTasks") && process.env.DEBUG_REQ) console.log("DEBUG REQ getTasks", JSON.stringify(state.tasks.map((t) => [t.ItemId, t.name, t.list, t.done])), JSON.stringify(filter()));
     const filter = () => { try { return JSON.parse(JSON.parse(body).variables?.filter ?? "{}"); } catch { return {}; } };
     if (/signup-settings/.test(href)) return answer({ isSignUpEnable: true, isEmailPasswordSignUpEnabled: true });
     if (/iam\/me|auth\/me/.test(href)) return answer({ itemId: "u1", firstName: "Priya", lastName: "Shah", email: "p@somewhere.test", roles: [], permissions: [] });

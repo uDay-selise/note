@@ -15,7 +15,7 @@ export function TaskPage({ taskId, onNavigate }: { taskId: string; onNavigate: (
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const taskQuery = useQuery({ queryFn: () => fetchTask(taskId), queryKey: ["task", taskId] });
   const listsQuery = useQuery({ queryFn: fetchLists, queryKey: ["lists"] });
-  const task = taskQuery.data;
+  const task = taskQuery.data ?? undefined;
   const lists = listsQuery.data?.ok ? listsQuery.data.items : [];
   const profile = me.data?.data;
   const person = {

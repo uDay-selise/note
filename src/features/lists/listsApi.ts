@@ -85,11 +85,11 @@ export async function fetchTasks(): Promise<FetchResult<TaskRecord>> {
   return { items: itemsOf(answer, "getTasks").map(toTask), ok: true };
 }
 
-export async function fetchTask(id: string): Promise<TaskRecord | undefined> {
+export async function fetchTask(id: string): Promise<TaskRecord | null> {
   const answer = (await tasks.get(id)) as unknown as RawAnswer;
-  if (refusal(answer)) return undefined;
+  if (refusal(answer)) return null;
   const raw = itemsOf(answer, "getTasks")[0];
-  return raw ? toTask(raw) : undefined;
+  return raw ? toTask(raw) : null;
 }
 
 export function createList(name: string): Promise<SaveAnswer> {
