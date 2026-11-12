@@ -119,5 +119,14 @@
   "welcome.step.list": "একটি তালিকা বানান",
   "welcome.step.tick": "সেগুলো টিক দিন",
   "welcome.title.a": "সব কাজ এক জায়গায়",
-  "welcome.title.b": "রাখুন।"
+  "welcome.title.b": "রাখুন।",
+  "lists.renameTitle": "তালিকার নাম বদলান",
+  "lists.renameDetail": "এমন নতুন নাম দিন যা আপনি দ্রুত খুঁজে পাবেন।",
+  "lists.renameSave": "সংরক্ষণ",
+  "lists.renameSaved": "তালিকার নাম বদলানো হয়েছে। এর কাজগুলোও সঙ্গে যাচ্ছে।",
+  "lists.removeTitle": "তালিকা সরান",
+  "lists.removeConfirm": "এই তালিকা ও এর কাজগুলো সরাবেন? এটা আর ফেরানো যাবে না।",
+  "lists.remove": "সরান",
+  "lists.removeSaved": "তালিকা সরানো হয়েছে।",
+  "lists.removeFailed": "তালিকাটি সরানো যায়নি। আবার চেষ্টা করুন।"
 }

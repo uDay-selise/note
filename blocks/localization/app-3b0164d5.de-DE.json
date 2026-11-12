@@ -119,5 +119,14 @@
   "welcome.step.list": "Liste anlegen",
   "welcome.step.tick": "Abhaken",
   "welcome.title.a": "Alles an einem Ort",
-  "welcome.title.b": "behalten."
+  "welcome.title.b": "behalten.",
+  "lists.renameTitle": "Liste umbenennen",
+  "lists.renameDetail": "Gib ihr einen neuen Namen, den du schnell findest.",
+  "lists.renameSave": "Speichern",
+  "lists.renameSaved": "Liste umbenannt. Ihre Aufgaben kommen mit.",
+  "lists.removeTitle": "Liste entfernen",
+  "lists.removeConfirm": "Diese Liste und ihre Aufgaben entfernen? Das lässt sich nicht rückgängig machen.",
+  "lists.remove": "Entfernen",
+  "lists.removeSaved": "Liste entfernt.",
+  "lists.removeFailed": "Die Liste ließ sich nicht entfernen. Versuch es noch einmal."
 }
