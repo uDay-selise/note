@@ -262,6 +262,29 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
     </div>
   );
 
+  const makeListForm = formOpen ? (
+    <section className="ds-card ds-panel new-list" id="make-list" aria-label={t("lists.form.title")}>
+      <div className="new-list-inner">
+        <h2 className="ds-h2" style={{ fontSize: "20px", margin: "0 0 calc(4px * var(--space-scale, 1))" }}>{t("lists.form.title")}</h2>
+        <p className="ds-muted" style={{ margin: "0 0 calc(16px * var(--space-scale, 1))", fontSize: "14px" }}>{t("lists.form.detail")}</p>
+        <form className="ds-form" onSubmit={(event) => void submit(event)} noValidate>
+          <div className="ds-field">
+            <label className="ds-label" htmlFor="list-name">{t("lists.form.label")}</label>
+            {" "}
+            <input className="ds-input" id="list-name" ref={nameRef} type="text" maxLength={60} value={name} onChange={(event) => { setName(event.target.value); setFormError(undefined); }} aria-invalid={formError ? true : undefined} />
+            {" "}
+            {formError ? <span className="ds-error" role="alert">{formError}</span> : <span className="ds-hint">{t("lists.form.hint")}</span>}
+          </div>
+          <div className="ds-form-actions">
+            <button className="ds-btn ds-btn-secondary" type="button" onClick={cancelForm}>{t("lists.form.cancel")}</button>
+            {" "}
+            <button className="ds-btn" type="submit" disabled={saving}>{t("lists.form.submit")}</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  ) : null;
+
   return (
     <div className="studio-screen-lists" style={{ display: "contents" }}>
       <main data-screen="lists" className="lists-root">
@@ -330,35 +353,17 @@ export function ListsScreen({ situation = "normal", onNavigate, person, onSignOu
         {situation === "no-lists" ? (
           <section data-state="no-lists">
             {head(false)}
-            <div className="ds-page lists-body">{emptyBlock(t("lists.empty.title"), t("lists.taskForm.noLists"), true)}</div>
+            <div className="ds-page lists-body">
+              {makeListForm}
+              {emptyBlock(t("lists.empty.title"), t("lists.taskForm.noLists"), true)}
+            </div>
           </section>
         ) : null}
         {situation === "normal" ? (
           <div>
             {head(true)}
             <div className="ds-page lists-body">
-              {formOpen ? (
-                <section className="ds-card ds-panel new-list" id="make-list" aria-label={t("lists.form.title")}>
-                  <div className="new-list-inner">
-                    <h2 className="ds-h2" style={{ fontSize: "20px", margin: "0 0 calc(4px * var(--space-scale, 1))" }}>{t("lists.form.title")}</h2>
-                    <p className="ds-muted" style={{ margin: "0 0 calc(16px * var(--space-scale, 1))", fontSize: "14px" }}>{t("lists.form.detail")}</p>
-                    <form className="ds-form" onSubmit={(event) => void submit(event)} noValidate>
-                      <div className="ds-field">
-                        <label className="ds-label" htmlFor="list-name">{t("lists.form.label")}</label>
-                        {" "}
-                        <input className="ds-input" id="list-name" ref={nameRef} type="text" maxLength={60} value={name} onChange={(event) => { setName(event.target.value); setFormError(undefined); }} aria-invalid={formError ? true : undefined} />
-                        {" "}
-                        {formError ? <span className="ds-error" role="alert">{formError}</span> : <span className="ds-hint">{t("lists.form.hint")}</span>}
-                      </div>
-                      <div className="ds-form-actions">
-                        <button className="ds-btn ds-btn-secondary" type="button" onClick={cancelForm}>{t("lists.form.cancel")}</button>
-                        {" "}
-                        <button className="ds-btn" type="submit" disabled={saving}>{t("lists.form.submit")}</button>
-                      </div>
-                    </form>
-                  </div>
-                </section>
-              ) : null}
+              {makeListForm}
               {!formOpen && notice?.where === "list" ? <div className="ds-notice ds-notice-success" style={{ marginBottom: "calc(16px * var(--space-scale, 1))" }}>{notice.text}</div> : null}
               <div className="list-grid lift">
                 {lists.map((list) => {
