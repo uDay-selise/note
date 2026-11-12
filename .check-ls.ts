@@ -99,6 +99,7 @@ const b = mount();
 await b.render();
 await clickText(b.host, "Make a list");
 check("LS-02 form opens", Boolean(b.host.querySelector("#list-name")), "Make a list opens a form with the name field");
+if (!b.host.querySelector("#list-name")) console.log("DEBUG text:", JSON.stringify((b.host.textContent ?? "").slice(-300)), "buttons:", Array.from(b.host.querySelectorAll("button")).map((x) => x.textContent?.trim()).join("|"));
 await setInputOn(b.host, "list-name", "Home");
 await clickText(b.host, "Make list");
 await clickText(b.host, "Make a list");
