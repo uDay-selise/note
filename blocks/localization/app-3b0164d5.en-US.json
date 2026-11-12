@@ -119,5 +119,14 @@
   "welcome.step.list": "Make a list",
   "welcome.step.tick": "Tick them done",
   "welcome.title.a": "Keep your tasks",
-  "welcome.title.b": "in one place."
+  "welcome.title.b": "in one place.",
+  "lists.renameTitle": "Rename list",
+  "lists.renameDetail": "Give it a new name you'll spot quickly.",
+  "lists.renameSave": "Save",
+  "lists.renameSaved": "List renamed. Its tasks come along with it.",
+  "lists.removeTitle": "Remove list",
+  "lists.removeConfirm": "Remove this list and its tasks? This can't be undone.",
+  "lists.remove": "Remove",
+  "lists.removeSaved": "List removed.",
+  "lists.removeFailed": "The list couldn't be removed. Please try again."
 }
