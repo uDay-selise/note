@@ -7,5 +7,11 @@
   "data": {
     "schemas": "blocks/data/schemas",
     "rules": "blocks/data/rules.json"
+  },
+  "repo": {
+    "branch": "main",
+    "fullName": "uDay-selise/note",
+    "provider": "github",
+    "url": "https://github.com/uDay-selise/note"
   }
 }

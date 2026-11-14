@@ -8,3 +8,5 @@ dist/
 .cert/
 *.pem
 .studio/
+.env.local
+.env.*.local
